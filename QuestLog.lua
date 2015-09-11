@@ -572,7 +572,7 @@ function QuestLog:ResizeTree()
 					end
 				end
 
-				local nItemHeights = wndMiddleLevelItems:ArrangeChildrenVert(0)
+				local nItemHeights = wndMiddleLevelItems:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop)
 				if nItemHeights > 0 then
 					nItemHeights = nItemHeights + 3
 				end
@@ -584,12 +584,12 @@ function QuestLog:ResizeTree()
 			wndTopLevelItems:DestroyChildren()
 		end
 
-		local nItemHeights = wndTopLevelItems:ArrangeChildrenVert(0, function(a,b) return a:GetData() > b:GetData() end) -- Tasks to bottom
+		local nItemHeights = wndTopLevelItems:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop, function(a,b) return a:GetData() > b:GetData() end) -- Tasks to bottom
 		local nTopLeft, nTopTop, nTopRight, nTopBottom = wndTop:GetAnchorOffsets()
 		wndTop:SetAnchorOffsets(nTopLeft, nTopTop, nTopRight, nTopTop + self.knTopLevelHeight + nItemHeights)
 	end
 
-	self.wndLeftSideScroll:ArrangeChildrenVert(0)
+	self.wndLeftSideScroll:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop)
 	self.wndLeftSideScroll:RecalculateContentExtents()
 
 	if wndDeepestSelected ~= nil then
@@ -609,21 +609,21 @@ function QuestLog:ResizeRight()
 	end
 
 	-- Objectives Frame
-	nHeight = self.wndMain:FindChild("QuestInfoObjectivesList"):ArrangeChildrenVert(0)
+	nHeight = self.wndMain:FindChild("QuestInfoObjectivesList"):ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop)
 	nLeft, nTop, nRight, nBottom = self.wndMain:FindChild("QuestInfoObjectivesFrame"):GetAnchorOffsets()
 	self.wndMain:FindChild("QuestInfoObjectivesFrame"):SetAnchorOffsets(nLeft, nTop, nRight, nTop + nHeight + 40)
 	self.wndMain:FindChild("QuestInfoObjectivesFrame"):Show(#self.wndMain:FindChild("QuestInfoObjectivesList"):GetChildren() > 0)
 	self.wndMain:FindChild("PaddingObjective"):Show(#self.wndMain:FindChild("QuestInfoObjectivesList"):GetChildren() > 0)
 
 	-- Rewards Recevived
-	nHeight = self.wndMain:FindChild("QuestInfoRewardRecList"):ArrangeChildrenVert(0)
+	nHeight = self.wndMain:FindChild("QuestInfoRewardRecList"):ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop)
 	nLeft, nTop, nRight, nBottom = self.wndMain:FindChild("QuestInfoRewardRecFrame"):GetAnchorOffsets()
 	self.wndMain:FindChild("QuestInfoRewardRecFrame"):SetAnchorOffsets(nLeft, nTop, nRight, nTop + nHeight + self.nRewardRecListHeight + 15) -- TODO: Hardcoded footer padding
 	self.wndMain:FindChild("QuestInfoRewardRecFrame"):Show(#self.wndMain:FindChild("QuestInfoRewardRecList"):GetChildren() > 0)
 	self.wndMain:FindChild("PaddingReward"):Show(#self.wndMain:FindChild("QuestInfoRewardRecList"):GetChildren() > 0)
 
 	-- Rewards to Choose
-	nHeight = self.wndMain:FindChild("QuestInfoRewardChoList"):ArrangeChildrenVert(0, function(a,b) return b:FindChild("RewardItemCantUse"):IsShown() end)
+	nHeight = self.wndMain:FindChild("QuestInfoRewardChoList"):ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop, function(a,b) return b:FindChild("RewardItemCantUse"):IsShown() end)
 	nLeft, nTop, nRight, nBottom = self.wndMain:FindChild("QuestInfoRewardChoFrame"):GetAnchorOffsets()
 	self.wndMain:FindChild("QuestInfoRewardChoFrame"):SetAnchorOffsets(nLeft, nTop, nRight, nTop + nHeight + self.nRewardChoListHeight + 15) -- TODO: Hardcoded footer padding
 	self.wndMain:FindChild("QuestInfoRewardChoFrame"):Show(#self.wndMain:FindChild("QuestInfoRewardChoList"):GetChildren() > 0)
@@ -663,9 +663,9 @@ function QuestLog:ResizeRight()
 
 	-- Resize
 	local nLeft, nTop, nRight, nBottom = self.wndMain:FindChild("QuestInfo"):GetAnchorOffsets()
-	self.wndMain:FindChild("QuestInfo"):SetAnchorOffsets(nLeft, nTop, nRight, nTop + self.wndMain:FindChild("QuestInfo"):ArrangeChildrenVert(0))
+	self.wndMain:FindChild("QuestInfo"):SetAnchorOffsets(nLeft, nTop, nRight, nTop + self.wndMain:FindChild("QuestInfo"):ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop))
 
-	self.wndRightSide:ArrangeChildrenVert(0)
+	self.wndRightSide:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop)
 	self.wndRightSide:RecalculateContentExtents()
 end
 
@@ -818,7 +818,7 @@ function QuestLog:DrawRightSide(queSelected)
 		self.wndMain:FindChild("QuestTrackBtn"):SetText(bIsTracked and Apollo.GetString("QuestLog_Untrack") or Apollo.GetString("QuestLog_Track"))
 		self.wndMain:FindChild("QuestTrackBtn"):SetTooltip(bIsTracked and Apollo.GetString("QuestLog_RemoveFromTracker") or Apollo.GetString("QuestLog_AddToTracker"))
 	end
-	--self.wndMain:FindChild("QuestInfoControlButtons"):ArrangeChildrenHorz(1)
+	--self.wndMain:FindChild("QuestInfoControlButtons"):ArrangeChildrenHorz(Window.CodeEnumArrangeOrigin.Middle)
 
 	-- Hide Pop Out CloseOnExternalClick windows
 	self.wndMain:FindChild("QuestAbandonConfirm"):Show(false)
