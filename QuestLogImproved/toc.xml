@@ -1,4 +1,4 @@
-<Addon Name="QuestLogImproved" Author="Aramunn" APIVersion="10" Version="10.0.1" Description="Improvements to Carbine's QuestLog.">
+<Addon Name="QuestLogImproved" Author="Aramunn" APIVersion="10" Version="10.0.2" Description="Improvements to Carbine's QuestLog.">
   <Script Name="QuestLogImproved.lua"/>
   <Form Name="QuestLogImproved.xml"/>
   <ReplaceAddon Name="QuestLog"/>
