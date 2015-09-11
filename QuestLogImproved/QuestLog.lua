@@ -342,7 +342,7 @@ function QuestLog:RedrawLeftTree()
 	local arCategories = {}
 	local arEpisodes = {}
 	local arQuests = {}
-	local bHasTasks = false
+	local bHasTasks = {}
 
 	local bShowCompleted = self.wndLeftFilterFinished:IsChecked()
 	local arAllEpisodes = QuestLib.GetAllEpisodes(bShowCompleted, true)
@@ -381,7 +381,8 @@ function QuestLog:RedrawLeftTree()
 							if self:CheckLeftSideFilters(queQuest) then
 								bEpHasQuests = true
 								if bAddQuests then
-									table.insert(arQuests, queQuest)
+									arQuests[strEpisodeKey] = arQuests[strEpisodeKey] or {}
+									table.insert(arQuests[strEpisodeKey], queQuest)
 								else
 									break
 								end
@@ -393,8 +394,9 @@ function QuestLog:RedrawLeftTree()
 						end
 					end
 					
+					arEpisodes[strCategoryKey] = arEpisodes[strCategoryKey] or {}
 					if bEpHasQuests then
-						table.insert(arEpisodes, epiEpisode)
+						table.insert(arEpisodes[strCategoryKey], epiEpisode)
 					end
 				end
 			end
@@ -415,10 +417,11 @@ function QuestLog:RedrawLeftTree()
 						local strEpisodeKey
 
 						if epiEpisode:IsZoneStory() or epiEpisode:IsRegionalStory() then
-							table.insert(arEpisodes, epiEpisode)
+							arEpisodes[strCategoryKey] = arEpisodes[strCategoryKey] or {}
+							table.insert(arEpisodes[strCategoryKey], epiEpisode)
 							strEpisodeKey = strCategoryKey.."E"..epiEpisode:GetId()
 						else -- task
-							bHasTasks = true
+							bHasTasks[strCategoryKey] = true
 							strEpisodeKey = strCategoryKey.."ETasks"
 						end
 
@@ -426,7 +429,8 @@ function QuestLog:RedrawLeftTree()
 						if wndMiddle ~= nil and wndMiddle:IsValid() and wndMiddle:FindChild("MiddleLevelBtn"):IsChecked() then
 							for idx3, queQuest in pairs(epiEpisode:GetAllQuests(qcCategory:GetId())) do
 								if self:CheckLeftSideFilters(queQuest) then
-									table.insert(arQuests, queQuest)
+									arQuests[strEpisodeKey] = arQuests[strEpisodeKey] or {}
+									table.insert(arQuests[strEpisodeKey], queQuest)
 								end
 							end
 						end
@@ -440,7 +444,8 @@ function QuestLog:RedrawLeftTree()
 	local fnBuildCategoryEpisodeQuests = function(strEpisodeKey, wndMiddle)
 		if wndMiddle:FindChild("MiddleLevelBtn"):IsChecked() then
 			local wndMiddleLevelItems = wndMiddle:FindChild("MiddleLevelItems")
-			for idx3, queQuest in pairs(arQuests) do
+			arQuests[strEpisodeKey] = arQuests[strEpisodeKey] or {}
+			for idx3, queQuest in pairs(arQuests[strEpisodeKey]) do
 				local strQuestKey = strEpisodeKey.."Q"..queQuest:GetId()
 				local wndBot = self:FactoryCacheProduce(wndMiddleLevelItems, "BottomLevelItem", strQuestKey)
 				self:HelperSetupBottomLevelWindow(wndBot, queQuest)
@@ -452,8 +457,9 @@ function QuestLog:RedrawLeftTree()
 		if wndTop:FindChild("TopLevelBtn"):IsChecked() then
 			local wndTopLevelItems = wndTop:FindChild("TopLevelItems")
 
-			if #arEpisodes > 0 then
-				for idx2, epiEpisode in pairs(arEpisodes) do
+			arEpisodes[strCategoryKey] = arEpisodes[strCategoryKey] or {}
+			if #arEpisodes[strCategoryKey] > 0 then
+				for idx2, epiEpisode in pairs(arEpisodes[strCategoryKey]) do
 					local strEpisodeKey = strCategoryKey.."E"..epiEpisode:GetId()
 					local wndMiddle = self:FactoryCacheProduce(wndTopLevelItems, "MiddleLevelItem", strEpisodeKey)
 					self:HelperSetupMiddleLevelWindow(wndMiddle, epiEpisode)
@@ -466,7 +472,7 @@ function QuestLog:RedrawLeftTree()
 				end
 			end
 
-			if bHasTasks then
+			if bHasTasks[strCategoryKey] then
 				local strEpisodeKey = strCategoryKey.."ETasks"
 				local wndMiddle = self:FactoryCacheProduce(wndTopLevelItems, "MiddleLevelItem", strEpisodeKey)
 				self:HelperSetupFakeMiddleLevelWindow(wndMiddle, Apollo.GetString("QuestLog_Tasks"))
