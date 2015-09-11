@@ -1,0 +1,1 @@
+# wildstar-quest-log-improved
