@@ -1296,5 +1296,9 @@ function QuestLog:FactoryCacheProduce(wndParent, strFormName, strKey)
 	return wnd
 end
 
+function QuestLog:OnExpandAllQuestsBtn(wndHandler, wndControl)
+  Print("OnExpandAllQuestsBtn called")
+end
+
 local QuestLogInst = QuestLog:new()
 QuestLogInst:Init()
