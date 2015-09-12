@@ -1300,5 +1300,9 @@ function QuestLog:OnExpandAllQuestsBtn(wndHandler, wndControl)
   Print("OnExpandAllQuestsBtn called")
 end
 
+function QuestLog:OnCollapseAllQuestsBtn(wndHandler, wndControl)
+  Print("OnCollapseAllQuestsBtn called")
+end
+
 local QuestLogInst = QuestLog:new()
 QuestLogInst:Init()
