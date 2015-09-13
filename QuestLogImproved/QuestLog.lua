@@ -1297,29 +1297,31 @@ function QuestLog:FactoryCacheProduce(wndParent, strFormName, strKey)
 end
 
 function QuestLog:ChangeAllLeftSideScrollChecks(set)
-  local topCount = 0
   for idx1, wndTop in pairs(self.wndLeftSideScroll:GetChildren()) do
     local wndTopLevelBtn = wndTop:FindChild("TopLevelBtn")
     local wndTopLevelItems = wndTop:FindChild("TopLevelItems")
     wndTopLevelBtn:SetCheck(set)
-    topCount = topCount + 1
-    local middleCount = 0
     for idx2, wndMiddle in pairs(wndTopLevelItems:GetChildren()) do
       local wndMiddleLevelBtn = wndMiddle:FindChild("MiddleLevelBtn")
       wndMiddleLevelBtn:SetCheck(set)
-      middleCount = middleCount + 1
     end
-    Print("Checked "..middleCount.." middle buttons")
   end
-  Print("Checked "..topCount.." top buttons")
 end
 
 function QuestLog:OnExpandAllQuestsBtn(wndHandler, wndControl)
   self:ChangeAllLeftSideScrollChecks(true)
+  self:RedrawLeftTree()
+  self:ChangeAllLeftSideScrollChecks(true)
+  self:RedrawLeftTree()
+  self.wndLeftSideScroll:SetVScrollPos(0)
+  self:ResizeTree()
 end
 
 function QuestLog:OnCollapseAllQuestsBtn(wndHandler, wndControl)
   self:ChangeAllLeftSideScrollChecks(false)
+  self:RedrawLeftTree()
+  self.wndLeftSideScroll:SetVScrollPos(0)
+  self:ResizeTree()
 end
 
 local QuestLogInst = QuestLog:new()
