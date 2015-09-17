@@ -565,14 +565,14 @@ function QuestLog:ResizeTree()
 					local wndBottomLevelBtnText = wndBot:FindChild("BottomLevelBtn:BottomLevelBtnText")
 					wndBottomLevelBtnText:SetHeightToContentHeight()
 
-					if wndBottomLevelBtnText:GetHeight() >= 25 then
+					if wndBottomLevelBtnText:GetHeight() >= 20 then
 						local nLeft, nTop, nRight, nBottom = wndBot:GetAnchorOffsets()
-						wndBot:SetAnchorOffsets(nLeft, nTop, nRight, nTop + 50)
+						wndBot:SetAnchorOffsets(nLeft, nTop, nRight, nTop + 40)
 					end
 
 					if wndBottomLevelBtnText:GetHeight() >= 50 then
 						local nLeft, nTop, nRight, nBottom = wndBot:GetAnchorOffsets()
-						wndBot:SetAnchorOffsets(nLeft, nTop, nRight, nTop + 69)
+						wndBot:SetAnchorOffsets(nLeft, nTop, nRight, nTop + 60)
 					end
 
 					if wndBot:FindChild("BottomLevelBtn"):IsChecked() then
@@ -582,7 +582,7 @@ function QuestLog:ResizeTree()
 
 				local nItemHeights = wndMiddleLevelItems:ArrangeChildrenVert(0)
 				if nItemHeights > 0 then
-					nItemHeights = nItemHeights + 7
+					nItemHeights = nItemHeights + 3
 				end
 
 				local nMiddleLeft, nMiddleTop, nMiddleRight, nMiddleBottom = wndMiddle:GetAnchorOffsets()
@@ -591,13 +591,8 @@ function QuestLog:ResizeTree()
 		else
 			wndTopLevelItems:DestroyChildren()
 		end
-		wndTopLevelItems:SetSprite(wndTopLevelBtn:IsChecked() and "kitInnerFrame_MetalGold_FrameBright2" or "kitInnerFrame_MetalGold_FrameDull")
 
 		local nItemHeights = wndTopLevelItems:ArrangeChildrenVert(0, function(a,b) return a:GetData() > b:GetData() end) -- Tasks to bottom
-		if nItemHeights > 0 then
-			nItemHeights = nItemHeights + 12
-		end
-
 		local nTopLeft, nTopTop, nTopRight, nTopBottom = wndTop:GetAnchorOffsets()
 		wndTop:SetAnchorOffsets(nTopLeft, nTopTop, nTopRight, nTopTop + self.knTopLevelHeight + nItemHeights)
 	end
