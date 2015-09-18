@@ -547,21 +547,7 @@ function QuestLog:ResizeTree()
 					wndDeepestSelected = wndMiddle
 				end
 
-				for idx3, wndBot in pairs(wndMiddleLevelItems:GetChildren()) do -- Resize if too long
-
-					local wndBottomLevelBtnText = wndBot:FindChild("BottomLevelBtn:BottomLevelBtnText")
-					wndBottomLevelBtnText:SetHeightToContentHeight()
-
-					if wndBottomLevelBtnText:GetHeight() >= 20 then
-						local nLeft, nTop, nRight, nBottom = wndBot:GetAnchorOffsets()
-						wndBot:SetAnchorOffsets(nLeft, nTop, nRight, nTop + 40)
-					end
-
-					if wndBottomLevelBtnText:GetHeight() >= 50 then
-						local nLeft, nTop, nRight, nBottom = wndBot:GetAnchorOffsets()
-						wndBot:SetAnchorOffsets(nLeft, nTop, nRight, nTop + 60)
-					end
-
+				for idx3, wndBot in pairs(wndMiddleLevelItems:GetChildren()) do
 					if wndBot:FindChild("BottomLevelBtn"):IsChecked() then
 						wndDeepestSelected = wndBot
 					end
