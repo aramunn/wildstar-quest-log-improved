@@ -232,6 +232,10 @@ function QuestLog:DestroyAndRedraw() -- TODO, remove as much as possible that ca
 	self:OnExpandAllQuestsBtn(nil, nil)
 
 	self:RedrawRight()
+
+	-- Start with no quests checked
+	self.wndQuestInfoControls:Show(false)
+	self.wndRightSide:Show(false)
 end
 
 function QuestLog:RedrawLeftTreeFromUI()
