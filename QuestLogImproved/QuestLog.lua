@@ -228,26 +228,9 @@ function QuestLog:DestroyAndRedraw() -- TODO, remove as much as possible that ca
 
 	self:RedrawLeftTree() -- Add categories
 
-	-- Show first in Quest Log
-	local wndTop = self.wndLeftSideScroll:GetChildren()[1]
-	if wndTop then
-		wndTop:FindChild("TopLevelBtn"):SetCheck(true)
-		self:RedrawLeftTree() -- Add episodes
+	-- Start with all expanded
+	self:OnExpandAllQuestsBtn(nil, nil)
 
-		local wndMiddle = wndTop:FindChild("TopLevelItems"):GetChildren()[1]
-		if wndMiddle then
-			wndMiddle:FindChild("MiddleLevelBtn"):SetCheck(true)
-			self:RedrawLeftTree() --Add quests
-
-			local wndBot = wndMiddle:FindChild("MiddleLevelItems"):GetChildren()[1]
-			if wndBot then
-				wndBot:FindChild("BottomLevelBtn"):SetCheck(true)
-				self:OnBottomLevelBtnCheck(wndBot:FindChild("BottomLevelBtn"), wndBot:FindChild("BottomLevelBtn"))
-			end
-		end
-	end
-
-	self:ResizeTree()
 	self:RedrawRight()
 end
 
