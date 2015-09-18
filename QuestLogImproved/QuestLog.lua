@@ -948,12 +948,6 @@ function QuestLog:OnMiddleLevelBtnCheck(wndHandler, wndControl)
 	self:RedrawLeftTree()
 	self:ResizeTree()
 	self.wndLeftSideScroll:SetVScrollPos(nScrollPos)
-
-	local wndBot = wndHandler:GetParent():FindChild("MiddleLevelItems"):GetChildren()[1]
-	if wndBot then
-		wndBot:FindChild("BottomLevelBtn"):SetCheck(true)
-		self:OnBottomLevelBtnCheck(wndBot:FindChild("BottomLevelBtn"), wndBot:FindChild("BottomLevelBtn"))
-	end
 end
 
 function QuestLog:OnMiddleLevelBtnUncheck(wndHandler, wndControl)
