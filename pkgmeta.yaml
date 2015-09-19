@@ -1,0 +1,7 @@
+package-as: QuestLogImproved
+enable-nolib-creation: no
+
+ignore:
+  - README.md
+  - LICENSE
+  - TODO.txt
