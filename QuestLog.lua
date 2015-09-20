@@ -965,6 +965,15 @@ function QuestLog:OnBottomLevelBtnDown( wndHandler, wndControl, eMouseButton )
 	end
 end
 
+function QuestLog:OnQuickTrackBtnCheck(wndHandler, wndControl)
+  -- self.wndLastBottomLevelBtnSelection = wndHandler
+  Print("Checked")
+end
+
+function QuestLog:OnQuickTrackBtnUncheck(wndHandler, wndControl)
+  Print("Unchecked")
+end
+
 -----------------------------------------------------------------------------------------------
 -- Bottom Buttons and Quest Update Events
 -----------------------------------------------------------------------------------------------
