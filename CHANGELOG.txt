@@ -1,2 +1,4 @@
+10.2.0: added quick track/untrack buttons
+
 10.1.1: added quest level display
 10.1.0: first release
