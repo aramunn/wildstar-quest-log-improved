@@ -966,12 +966,15 @@ function QuestLog:OnBottomLevelBtnDown( wndHandler, wndControl, eMouseButton )
 end
 
 function QuestLog:OnQuickTrackBtnCheck(wndHandler, wndControl)
-  -- self.wndLastBottomLevelBtnSelection = wndHandler
-  Print("Checked")
+  local queQuest = wndHandler:GetParent():FindChild("BottomLevelBtn"):GetData()
+  queQuest:SetTracked(true)
+  Event_FireGenericEvent("GenericEvent_QuestLog_TrackBtnClicked", queQuest)
 end
 
 function QuestLog:OnQuickTrackBtnUncheck(wndHandler, wndControl)
-  Print("Unchecked")
+  local queQuest = wndHandler:GetParent():FindChild("BottomLevelBtn"):GetData()
+  queQuest:SetTracked(false)
+  Event_FireGenericEvent("GenericEvent_QuestLog_TrackBtnClicked", queQuest)
 end
 
 -----------------------------------------------------------------------------------------------
