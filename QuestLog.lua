@@ -969,12 +969,14 @@ function QuestLog:OnQuickTrackBtnCheck(wndHandler, wndControl)
   local queQuest = wndHandler:GetParent():FindChild("BottomLevelBtn"):GetData()
   queQuest:SetTracked(true)
   Event_FireGenericEvent("GenericEvent_QuestLog_TrackBtnClicked", queQuest)
+  wndHandler:SetTooltip(Apollo.GetString("QuestLog_RemoveFromTracker"))
 end
 
 function QuestLog:OnQuickTrackBtnUncheck(wndHandler, wndControl)
   local queQuest = wndHandler:GetParent():FindChild("BottomLevelBtn"):GetData()
   queQuest:SetTracked(false)
   Event_FireGenericEvent("GenericEvent_QuestLog_TrackBtnClicked", queQuest)
+  wndHandler:SetTooltip(Apollo.GetString("QuestLog_AddToTracker"))
 end
 
 -----------------------------------------------------------------------------------------------
