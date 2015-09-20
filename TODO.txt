@@ -1,6 +1,2 @@
 add track/untrack in side bar
 add multi-quest actions
-
-try in yaml:
-	manual-changelog: CHANGELOG.txt
-	license-output: LICENSE.txt
