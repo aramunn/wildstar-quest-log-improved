@@ -527,6 +527,10 @@ function QuestLog:HelperSetupBottomLevelWindow(wndBot, queQuest)
 		strBottomLevelIconSprite = "CRB_Basekit:kitIcon_Metal_CircleCheckmark"
 	end
 	wndBot:FindChild("BottomLevelBtnIcon"):SetSprite(strBottomLevelIconSprite)
+
+	local wndQuickTrackBtn = wndBot:FindChild("QuickTrackBtn")
+	local bIsTracked = queQuest:IsTracked()
+	wndQuickTrackBtn:SetCheck(bIsTracked)
 end
 
 function QuestLog:ResizeTree()
