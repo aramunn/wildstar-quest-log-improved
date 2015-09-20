@@ -531,6 +531,13 @@ function QuestLog:HelperSetupBottomLevelWindow(wndBot, queQuest)
 	local wndQuickTrackBtn = wndBot:FindChild("QuickTrackBtn")
 	local bIsTracked = queQuest:IsTracked()
 	wndQuickTrackBtn:SetCheck(bIsTracked)
+	wndQuickTrackBtn:Enable(eState ~= Quest.QuestState_Botched)
+	-- Only show if quest is active
+	if eState == Quest.QuestState_Accepted or eState == Quest.QuestState_Achieved or eState == Quest.QuestState_Botched then
+		wndQuickTrackBtn:Show(true)
+	else
+		wndQuickTrackBtn:Show(false)
+	end
 end
 
 function QuestLog:ResizeTree()
