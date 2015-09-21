@@ -1,2 +1,1 @@
-add track/untrack in side bar
 add multi-quest actions
