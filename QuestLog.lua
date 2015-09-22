@@ -124,15 +124,15 @@ function QuestLog:Initialize()
 	self.wndMain:FindChild("EpisodeSummaryExpandBtn"):AttachWindow(self.wndMain:FindChild("EpisodeSummaryPopoutTextBG"))
 
 	-- Measure Windows
-	local wndMeasure = Apollo.LoadForm(self.xmlDoc, "SimpleTopLevelItem", nil, self)
+	local wndMeasure = Apollo.LoadForm(self.xmlDoc, "TopLevelItem", nil, self)
 	self.knTopLevelHeight = wndMeasure:GetHeight()
 	wndMeasure:Destroy()
 
-	wndMeasure = Apollo.LoadForm(self.xmlDoc, "SimpleMiddleLevelItem", nil, self)
+	wndMeasure = Apollo.LoadForm(self.xmlDoc, "MiddleLevelItem", nil, self)
 	self.knMiddleLevelHeight = wndMeasure:GetHeight()
 	wndMeasure:Destroy()
 
-	wndMeasure = Apollo.LoadForm(self.xmlDoc, "SimpleBottomLevelItem", nil, self)
+	wndMeasure = Apollo.LoadForm(self.xmlDoc, "BottomLevelItem", nil, self)
 	self.knBottomLevelHeight = wndMeasure:GetHeight()
 	wndMeasure:Destroy()
 
@@ -434,7 +434,7 @@ function QuestLog:RedrawLeftTree()
 			arQuests[strEpisodeKey] = arQuests[strEpisodeKey] or {}
 			for idx3, queQuest in pairs(arQuests[strEpisodeKey]) do
 				local strQuestKey = strEpisodeKey.."Q"..queQuest:GetId()
-				local wndBot = self:FactoryCacheProduce(wndMiddleLevelItems, "SimpleBottomLevelItem", strQuestKey)
+				local wndBot = self:FactoryCacheProduce(wndMiddleLevelItems, "BottomLevelItem", strQuestKey)
 				self:HelperSetupBottomLevelWindow(wndBot, queQuest)
 			end
 		end
@@ -448,7 +448,7 @@ function QuestLog:RedrawLeftTree()
 			if #arEpisodes[strCategoryKey] > 0 then
 				for idx2, epiEpisode in pairs(arEpisodes[strCategoryKey]) do
 					local strEpisodeKey = strCategoryKey.."E"..epiEpisode:GetId()
-					local wndMiddle = self:FactoryCacheProduce(wndTopLevelItems, "SimpleMiddleLevelItem", strEpisodeKey)
+					local wndMiddle = self:FactoryCacheProduce(wndTopLevelItems, "MiddleLevelItem", strEpisodeKey)
 					self:HelperSetupMiddleLevelWindow(wndMiddle, epiEpisode)
 
 					if epiEpisode:IsZoneStory() then
@@ -461,7 +461,7 @@ function QuestLog:RedrawLeftTree()
 
 			if bHasTasks[strCategoryKey] then
 				local strEpisodeKey = strCategoryKey.."ETasks"
-				local wndMiddle = self:FactoryCacheProduce(wndTopLevelItems, "SimpleMiddleLevelItem", strEpisodeKey)
+				local wndMiddle = self:FactoryCacheProduce(wndTopLevelItems, "MiddleLevelItem", strEpisodeKey)
 				self:HelperSetupFakeMiddleLevelWindow(wndMiddle, Apollo.GetString("QuestLog_Tasks"))
 				wndMiddle:SetData("")
 
@@ -472,14 +472,14 @@ function QuestLog:RedrawLeftTree()
 
 	if bWorldStoryHasData then
 		local strCategoryKey = "CWorldStory"
-		local wndTop = self:FactoryCacheProduce(self.wndLeftSideScroll, "SimpleTopLevelItem", strCategoryKey)
+		local wndTop = self:FactoryCacheProduce(self.wndLeftSideScroll, "TopLevelItem", strCategoryKey)
 		wndTop:FindChild("TopLevelBtn"):SetText(Apollo.GetString("QuestLog_WorldStory"))
 		fnBuildCategoryEpisodes(strCategoryKey, wndTop)
 	end
 
 	for idx1, qcCategory in pairs(arCategories) do
 		local strCategoryKey = "C"..qcCategory:GetId()
-		local wndTop = self:FactoryCacheProduce(self.wndLeftSideScroll, "SimpleTopLevelItem", strCategoryKey)
+		local wndTop = self:FactoryCacheProduce(self.wndLeftSideScroll, "TopLevelItem", strCategoryKey)
 		wndTop:FindChild("TopLevelBtn"):SetText(qcCategory:GetTitle())
 		fnBuildCategoryEpisodes(strCategoryKey, wndTop)
 	end
