@@ -289,6 +289,13 @@ function QuestLog:RedrawLeftTree()
 	strActiveQuests = String_GetWeaselString(Apollo.GetString("QuestLog_ActiveQuests"), strActiveQuests, self.nQuestCountMax)
 	self.wndMain:FindChild("QuestLogCountText"):SetAML(string.format("<P Font=\"CRB_InterfaceTiny_BB\" Align=\"Left\" TextColor=\"UI_BtnTextGoldListNormal\">%s</P>", strActiveQuests))
 
+	local activeQuestsProgressBar = self.wndLeftFilterActive:FindChild("ActiveQuestsProgressBar")
+	activeQuestsProgressBar:SetMax(self.nQuestCountMax)
+	activeQuestsProgressBar:SetProgress(nQuestCount)
+	--activeQuestsProgressBar:SetOpacity(.5, 0)
+	activeQuestsProgressBar:SetBarColor(CColor.new(1.0, 1.0, 1.0, .5))
+	--questLogCountText:ToFront()
+
 	local tCategoryEpisodeHaveQuestsCache = {}
 	local tCategoryHaveQuestsCache = {}
 
