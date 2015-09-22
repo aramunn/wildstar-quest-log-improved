@@ -292,9 +292,7 @@ function QuestLog:RedrawLeftTree()
 	local activeQuestsProgressBar = self.wndLeftFilterActive:FindChild("ActiveQuestsProgressBar")
 	activeQuestsProgressBar:SetMax(self.nQuestCountMax)
 	activeQuestsProgressBar:SetProgress(nQuestCount)
-	--activeQuestsProgressBar:SetOpacity(.5, 0)
-	activeQuestsProgressBar:SetBarColor(CColor.new(1.0, 1.0, 1.0, .5))
-	--questLogCountText:ToFront()
+	activeQuestsProgressBar:SetBarColor(strColor)
 
 	local tCategoryEpisodeHaveQuestsCache = {}
 	local tCategoryHaveQuestsCache = {}
