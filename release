@@ -1,0 +1,17 @@
+#!/bin/sh
+
+#check status
+#check branch
+#run git difftool
+#get release version
+#alpha/beta?
+#get change summary
+#make changes.txt
+#add to changelog.txt
+#diff
+#ask for ok
+#commit
+#tag
+#push
+#push tags
+#send release POST
