@@ -1,11 +1,38 @@
 #!/bin/sh
 
-#check status
-#check branch
+set -e #exit on error
+set -u #error on unset var usage
+
+#wait for ok before continuing
+pause() { read -p "Press Enter to continue..."; }
+
+#display script notes
+echo "Running release script. Ctrl+C to quit at any time."
+pause
+
+#check status and branch
+git status
+git branch
+echo "Ensure status is ok and we're on the right branch."
+pause
+
+#ask for previous release
+git tag
+read -p "Previous release: " previous
 #run git difftool
-#get release version
-#alpha/beta?
-#get change summary
+echo "Running difftool against $previous."
+pause
+git difftool $previous
+pause
+
+#ask for change summary
+read -p "Summary of changes: " changes
+#ask for release version
+read -p "Release version: " version
+#ask if release is alpha or beta
+read -p "[A]lpha or [B]eta? " prerelease
+#TODO do something with prerelease (switch?)
+
 #make changes.txt
 #add to changelog.txt
 #diff
