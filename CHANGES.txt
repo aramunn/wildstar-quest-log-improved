@@ -1,1 +1,1 @@
-New in @project-version@:
+New in 10.3.0: visual updates to left side
