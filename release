@@ -31,12 +31,24 @@ read -p "Summary of changes: " changes
 read -p "Release version: " version
 #ask if release is alpha or beta
 read -p "[A]lpha or [B]eta? " prerelease
-#TODO do something with prerelease (switch?)
+#TODO do something with prerelease (switch?) add to version
+
+#display obtained values
+echo "Version: $version"
+echo "Changes: $changes"
+pause
 
 #make changes.txt
+echo "New in $version: $changes" > CHANGES.txt
 #add to changelog.txt
+echo "$version: $changes" > tmp.txt
+cat CHANGELOG.txt >> tmp.txt
+mv tmp.txt CHANGELOG.txt
+
 #diff
-#ask for ok
+git diff
+pause
+
 #commit
 #tag
 #push
