@@ -8,7 +8,7 @@ user=aramunn
 repo=wildstar-quest-log-improved
 
 #wait for ok before continuing
-pause() { read -p "Press Enter to continue..."; }
+pause() { read -p "Press Enter to continue..."; echo; }
 
 #display script notes
 echo "Running release script. Ctrl+C to quit at any time."
@@ -16,7 +16,6 @@ pause
 
 #check status and branch
 git status
-git branch
 echo "Ensure status is ok and we're on the right branch"
 pause
 
@@ -44,6 +43,7 @@ case "$prerelease" in
 esac
 
 #display obtained values
+echo
 echo "Version: $version"
 echo "Changes: $changes"
 pause
@@ -59,17 +59,23 @@ pause
 
 #display changes
 git status
+pause
 git diff
+pause
 echo "Ready to release"
 pause
 
 #commit, tag, push
+echo "Commit changes"
 git c -am "releasing version $version"
 pause
+echo "Tag commit"
 git tag $version
 pause
+echo "Push branch"
 git push
 pause
+echo "Push tag"
 git push --tags
 pause
 
@@ -78,8 +84,8 @@ echo "Prepared to send release POST"
 echo "User: $user"
 echo "Repo: $repo"
 echo "Prerelease: $prerelease"
-echo "Version: $version"
-echo "Changes: $changes"
+echo "Tag: $version"
+echo "Name: $changes"
 pause
 curl -d "tag_name=$version" -d "name=$changes" $prerelease "https://api.github.com/repos/$user/$repo/releases"
 
