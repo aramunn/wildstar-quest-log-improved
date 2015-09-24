@@ -1,3 +1,1 @@
-get new screenshot
-better bottom button layout
-add multi-quest actions
+add multi-quest actions (maybe abandon all low level quests)
