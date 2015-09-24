@@ -45,12 +45,15 @@ echo "$version: $changes" > tmp.txt
 cat CHANGELOG.txt >> tmp.txt
 mv tmp.txt CHANGELOG.txt
 
-#diff
+#display changes
+git status
 git diff
 pause
 
-#commit
-#tag
-#push
-#push tags
+#commit, tag, push
+git c -am "releasing version $version"
+git tag $version
+git push
+git push --tags
+
 #send release POST
