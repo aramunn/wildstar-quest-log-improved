@@ -1,1 +1,1 @@
-New in 10.3.0: visual updates to left side
+New in 11.0.0: update to API 11 and merge in Carbine's minor changes

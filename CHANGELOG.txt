@@ -1,3 +1,4 @@
+11.0.0: update to API 11 and merge in Carbine's minor changes
 10.3.0: visual updates to left side
 10.2.0: added quick track/untrack buttons
 10.1.1: added quest level display
