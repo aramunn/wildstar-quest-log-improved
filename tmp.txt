@@ -49,3 +49,6 @@ CRB_GroupFrame:sprGroup_Btn_Options
 CRB_MinimapSprites:btnMM_ToggleMenu
 CRB_Raid:btnRaid_ConfigureGearIcon
 QuestLogSprites:btnQuestOptions
+
+BK3:UI_BK3_Metal_Inset_Block3
+CRB_UIKitSprites:spr_baseframeTHIN_Hologram
