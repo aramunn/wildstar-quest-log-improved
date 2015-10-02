@@ -2,6 +2,8 @@
 -- Client Lua Script for QuestLog
 -- Copyright (c) NCsoft. All rights reserved
 -----------------------------------------------------------------------------------------------
+-- Edits by aramunn for QuestLogImproved
+-----------------------------------------------------------------------------------------------
 
 require "Window"
 require "Quest"
@@ -24,7 +26,19 @@ function QuestLog:Init()
     Apollo.RegisterAddon(self)
 end
 
+---------------
+-- Constants --
+---------------
+
 local knEpisodeInfoBuffer = 10
+
+local ktOptions =
+{
+	"option1",
+	"option2",
+	"option3",
+	"option4",
+}
 
 local ktChatNotificationStrings =
 {
@@ -34,7 +48,6 @@ local ktChatNotificationStrings =
 	[Quest.QuestState_Abandoned] 	= Apollo.GetString("QuestLog_QuestAbandoned"),
 }
 
--- Constants
 local ktConToUI =
 {
 	{ "CRB_Basekit:kitFixedProgBar_1", "ff9aaea3", Apollo.GetString("QuestLog_Trivial") },
@@ -112,6 +125,7 @@ function QuestLog:Initialize()
 	self.wndLeftSideScroll = self.wndMain:FindChild("LeftSideScroll")
 	self.wndRightSide = self.wndMain:FindChild("RightSide")
 	self.wndQuestInfoControls = self.wndMain:FindChild("QuestInfoControls")
+	self.wndOptions = self.wndMain:FindChild("OptionsWindow")
 
 	-- Variables
 	self.wndLastBottomLevelBtnSelection = nil -- Just for button pressed state faking of text color
@@ -122,7 +136,7 @@ function QuestLog:Initialize()
 	self.wndLeftFilterActive:SetCheck(true)
 	self.wndMain:FindChild("QuestAbandonPopoutBtn"):AttachWindow(self.wndMain:FindChild("QuestAbandonConfirm"))
 	self.wndMain:FindChild("EpisodeSummaryExpandBtn"):AttachWindow(self.wndMain:FindChild("EpisodeSummaryPopoutTextBG"))
-	self.wndMain:FindChild("OptionsPopoutBtn"):AttachWindow(self.wndMain:FindChild("OptionsWindow"))
+	self.wndMain:FindChild("OptionsPopoutBtn"):AttachWindow(self.wndMain:FindChild("OptionsBGWindow"))
 
 	-- Measure Windows
 	local wndMeasure = Apollo.LoadForm(self.xmlDoc, "TopLevelItem", nil, self)
@@ -241,6 +255,12 @@ function QuestLog:DestroyAndRedraw() -- TODO, remove as much as possible that ca
 	-- Start with no quests checked
 	self.wndQuestInfoControls:Show(false)
 	self.wndRightSide:Show(false)
+
+	for idx, option in pairs(ktOptions) do
+		Print(option)
+		local wndOption = self:FactoryCacheProduce(self.wndOptions, "OptionsItem", option)
+	end
+	self.wndOptions:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop)
 end
 
 function QuestLog:RedrawLeftTreeFromUI()
