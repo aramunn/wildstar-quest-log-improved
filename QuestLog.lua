@@ -125,6 +125,7 @@ function QuestLog:Initialize()
 	self.wndLeftSideScroll = self.wndMain:FindChild("LeftSideScroll")
 	self.wndRightSide = self.wndMain:FindChild("RightSide")
 	self.wndQuestInfoControls = self.wndMain:FindChild("QuestInfoControls")
+	self.wndBGOptions = self.wndMain:FindChild("OptionsBGWindow")
 	self.wndOptions = self.wndMain:FindChild("OptionsWindow")
 
 	-- Variables
@@ -256,10 +257,17 @@ function QuestLog:DestroyAndRedraw() -- TODO, remove as much as possible that ca
 	self.wndQuestInfoControls:Show(false)
 	self.wndRightSide:Show(false)
 
+	local optionsHeight = 10
 	for idx, option in pairs(ktOptions) do
 		local wndOption = self:FactoryCacheProduce(self.wndOptions, "OptionsItem", option)
+    optionsHeight = optionsHeight + self.knOptionsHeight
 	end
+  local nOptionsLeft, nOptionsTop, nOptionsRight, nOptionsBottom = self.wndBGOptions:GetAnchorOffsets()
+  Print("Got "..nOptionsLeft..", "..nOptionsTop..", "..nOptionsRight..", "..nOptionsBottom)
+  self.wndBGOptions:SetAnchorOffsets(nOptionsLeft, nOptionsTop - optionsHeight, nOptionsRight, nOptionsBottom)
 	self.wndOptions:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop)
+  local nOptionsLeft, nOptionsTop, nOptionsRight, nOptionsBottom = self.wndBGOptions:GetAnchorOffsets()
+  Print("Got "..nOptionsLeft..", "..nOptionsTop..", "..nOptionsRight..", "..nOptionsBottom)
 end
 
 function QuestLog:RedrawLeftTreeFromUI()
