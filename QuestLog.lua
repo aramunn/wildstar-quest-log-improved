@@ -122,7 +122,8 @@ function QuestLog:Initialize()
 	self.wndLeftFilterActive:SetCheck(true)
 	self.wndMain:FindChild("QuestAbandonPopoutBtn"):AttachWindow(self.wndMain:FindChild("QuestAbandonConfirm"))
 	self.wndMain:FindChild("EpisodeSummaryExpandBtn"):AttachWindow(self.wndMain:FindChild("EpisodeSummaryPopoutTextBG"))
-	self.wndMain:FindChild("LeftSideOptionsBtn"):AttachWindow(self.wndMain:FindChild("OptionsList"))
+	self.wndMain:FindChild("OptionsPopoutBtn"):AttachWindow(self.wndMain:FindChild("OptionsWindow"))
+	-- self.wndMain:FindChild("LeftSideOptionsBtn"):Enable(true)
 
 	-- Measure Windows
 	local wndMeasure = Apollo.LoadForm(self.xmlDoc, "TopLevelItem", nil, self)
@@ -294,7 +295,8 @@ function QuestLog:RedrawLeftTree()
 	strActiveQuests = String_GetWeaselString(Apollo.GetString("QuestLog_ActiveQuests"), strActiveQuests, self.nQuestCountMax)
 	self.wndMain:FindChild("QuestLogCountText"):SetAML(string.format("<P Font=\"CRB_InterfaceTiny_BB\" Align=\"Left\" TextColor=\"ffffffff\">%s</P>", strActiveQuests))
 
-	self.wndMain:FindChild("OptionsList"):Show(false)
+	-- self.wndMain:FindChild("OptionsList"):Show(true)
+	-- self.wndMain:FindChild("LeftSideOptionsBtn"):Enable(true)
 
 	local activeQuestsProgressBar = self.wndLeftFilterActive:FindChild("ActiveQuestsProgressBar")
 	activeQuestsProgressBar:SetMax(self.nQuestCountMax)
