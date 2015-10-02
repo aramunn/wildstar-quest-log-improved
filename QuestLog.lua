@@ -137,6 +137,10 @@ function QuestLog:Initialize()
 	self.knBottomLevelHeight = wndMeasure:GetHeight()
 	wndMeasure:Destroy()
 
+	wndMeasure = Apollo.LoadForm(self.xmlDoc, "OptionsItem", nil, self)
+	self.knOptionsHeight = wndMeasure:GetHeight()
+	wndMeasure:Destroy()
+
 	wndMeasure = Apollo.LoadForm(self.xmlDoc, "ObjectivesItem", nil, self)
 	self.knObjectivesItemHeight = wndMeasure:GetHeight()
 	wndMeasure:Destroy()
