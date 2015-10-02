@@ -257,7 +257,6 @@ function QuestLog:DestroyAndRedraw() -- TODO, remove as much as possible that ca
 	self.wndRightSide:Show(false)
 
 	for idx, option in pairs(ktOptions) do
-		Print(option)
 		local wndOption = self:FactoryCacheProduce(self.wndOptions, "OptionsItem", option)
 	end
 	self.wndOptions:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop)
