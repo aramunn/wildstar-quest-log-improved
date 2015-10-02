@@ -262,12 +262,9 @@ function QuestLog:DestroyAndRedraw() -- TODO, remove as much as possible that ca
 		local wndOption = self:FactoryCacheProduce(self.wndOptions, "OptionsItem", option)
     optionsHeight = optionsHeight + self.knOptionsHeight
 	end
-  local nOptionsLeft, nOptionsTop, nOptionsRight, nOptionsBottom = self.wndBGOptions:GetAnchorOffsets()
-  Print("Got "..nOptionsLeft..", "..nOptionsTop..", "..nOptionsRight..", "..nOptionsBottom)
-  self.wndBGOptions:SetAnchorOffsets(nOptionsLeft, nOptionsTop - optionsHeight, nOptionsRight, nOptionsBottom)
-	self.wndOptions:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop)
-  local nOptionsLeft, nOptionsTop, nOptionsRight, nOptionsBottom = self.wndBGOptions:GetAnchorOffsets()
-  Print("Got "..nOptionsLeft..", "..nOptionsTop..", "..nOptionsRight..", "..nOptionsBottom)
+	local nOptionsLeft, nOptionsTop, nOptionsRight, nOptionsBottom = self.wndBGOptions:GetAnchorOffsets()
+	self.wndBGOptions:SetAnchorOffsets(nOptionsLeft, nOptionsBottom - optionsHeight, nOptionsRight, nOptionsBottom)
+	self.wndOptions:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.Middle)
 end
 
 function QuestLog:RedrawLeftTreeFromUI()
