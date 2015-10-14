@@ -1353,7 +1353,7 @@ function QuestLog:OnCollapseAllQuestsBtn(wndHandler, wndControl)
   self:ResizeTree()
 end
 
-function QuestLog:OnCollapseAllQuestsBtn(wndHandler, wndControl)
+function QuestLog:OnOptionsButton(wndHandler, wndControl)
 	Print("Option: "..wndHandler:GetData())
 end
 
