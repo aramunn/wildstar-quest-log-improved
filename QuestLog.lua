@@ -169,7 +169,8 @@ function QuestLog:Initialize()
 
 	local optionsHeight = 10
 	for idx, option in pairs(ktOptions) do
-		local wndOption = self:FactoryCacheProduce(self.wndOptions, "OptionsItem", option)
+		local wndOption = Apollo.LoadForm(self.xmlDoc, "OptionsItem", self.wndOptions, self)
+		wndOption:FindChild("OptionsButton"):SetData(option)
     optionsHeight = optionsHeight + self.knOptionsHeight
 	end
 	local nOptionsLeft, nOptionsTop, nOptionsRight, nOptionsBottom = self.wndBGOptions:GetAnchorOffsets()
