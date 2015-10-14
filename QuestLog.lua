@@ -1353,5 +1353,9 @@ function QuestLog:OnCollapseAllQuestsBtn(wndHandler, wndControl)
   self:ResizeTree()
 end
 
+function QuestLog:OnCollapseAllQuestsBtn(wndHandler, wndControl)
+	Print("Option: "..wndHandler:GetData())
+end
+
 local QuestLogInst = QuestLog:new()
 QuestLogInst:Init()
