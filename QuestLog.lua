@@ -32,6 +32,8 @@ end
 
 local knEpisodeInfoBuffer = 10
 
+local bottomLevelBtnSprite = "BK3:btnHolo_ListView_Mid"
+
 local ktOptions =
 {
 	"CRB_Basekit:kitBtn_List_MetalContextMenu",
@@ -599,11 +601,12 @@ function QuestLog:HelperSetupBottomLevelWindow(wndBot, queQuest)
 	local wndBottomLevelBtnText = wndBot:FindChild("BottomLevelBtnText")
 
 	local bOptionalQuest = queQuest:IsOptionalForEpisode(queQuest:GetEpisode():GetId())
-	wndBottomLevelBtn:SetData(queQuest)
+	wndBottomLevelBtn:ChangeArt(bottomLevelBtnSprite)
 	questText = bOptionalQuest and String_GetWeaselString(Apollo.GetString("QuestLog_OptionalAppend"), queQuest:GetTitle()) or queQuest:GetTitle()
 	questText = " ["..queQuest:GetConLevel().."] "..questText
 	wndBottomLevelBtnText:SetText(questText)
 	wndBottomLevelBtn:SetText(questText)
+	wndBottomLevelBtn:SetData(queQuest)
 
 	local strBottomLevelIconSprite = ""
 	local bHasCall = queQuest:GetContactInfo()
@@ -1411,7 +1414,10 @@ function QuestLog:OnCollapseAllQuestsBtn(wndHandler, wndControl)
 end
 
 function QuestLog:OnOptionsButton(wndHandler, wndControl)
-	Print("Option: "..wndHandler:GetData())
+	local option = wndHandler:GetData()
+	Print("Option: "..option)
+	bottomLevelBtnSprite = option
+	self:RedrawLeftTree()
 end
 
 local QuestLogInst = QuestLog:new()
