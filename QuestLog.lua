@@ -34,10 +34,60 @@ local knEpisodeInfoBuffer = 10
 
 local ktOptions =
 {
-	"option1",
-	"option2",
-	"option3",
-	"option4",
+	"CRB_Basekit:kitBtn_List_MetalContextMenu",
+	"CRB_Basekit:kitBtn_List_MetalNoEdge",
+	"BK3:btnMetal_ExpandMenu_LargeClean",
+	"BK3:btnMetal_ExpandMenu_MedClean",
+	"BK3:btnMetal_ExpandMenu_NoNav",
+	"CRB_Basekit:kitBtn_List_RightArrowHighlight",
+	"CRB_Basekit:kitBtn_ListHeader_Middle",
+	"CRB_Basekit:kitBtn_List_MetalBorder",
+	"CRB_Basekit:kitBtn_ListHeader_Top",
+	"CRB_Basekit:kitBtn_Metal_IconBase",
+	"CRB_Basekit:kitBtn_Metal_IconBaseStretch",
+	"CRB_CharacterCreateSprites:btnCharS_ListEntryNorm",
+	"CRB_DatachronSprites:btnDCM_DataMenu",
+	"CRB_DatachronSprites:btnDCPP_ExPlace",
+	"CRB_PlayerPathSprites:btnPP_BaseGrey",
+	"CRB_UIKitSprites:btn_listBG",
+	"CRB_UIKitSprites:btn_listBGTALL",
+	"OldMetalSprites:OldMetalGrid",
+	"OldMetalSprites:OldMetalGridHeader",
+
+	"CRB_Basekit:kitBtn_Metal",
+	"CRB_Basekit:kitBtn_Metal_LargeBlue",
+	"CRB_Basekit:kitBtn_Metal_LargeBlueStretch",
+	"CRB_Basekit:kitBtn_Metal_MediumBlue",
+	"CRB_Basekit:kitBtn_Metal_MediumBlueStretch",
+	"CRB_PlayerPathSprites:btnPP_SciListEntry",
+	"CRB_Tradeskills:btnSchemCraft",
+
+	"BK3:btnHolo_Btn_Mega",
+	"Contracts:btnContracts_CheckBox",
+	"CRB_Basekit:kitBtn_Holo",
+	"CRB_Basekit:kitBtn_Holo_Large",
+	"CRB_Basekit:kitBtn_List_Holo",
+	"CRB_HousingSprites:btnHologramRedfill",
+	"CRB_HousingSprites:btnPropertyMarker",
+	"CRB_PlayerPathSprites:btnPP_BaseBlue",
+	"CRB_PlayerPathSprites:btnPP_HologramBase",
+	"CRB_QuestTrackerSprites:btnQT_ScrollScroller",
+	"CRB_Raid:btnRaid_ThinHoloBlueBtn",
+	"CRB_TechTree:CRB_TechTree_BlueBtn",
+	"HUD_BottomBar:btn_HUD_MenuIconBtn",
+	"QuestLogSprites:btnQuestBlue",
+
+	"AbilitiesSprites:btn_Options",
+	"ChatLogSprites:CombatLogSettingsBtn",
+	"CRB_Basekit:kitBtn_Metal_Options",
+	"CRB_DatachronSprites:btnDCPP_SciConfig",
+	"CRB_GroupFrame:sprGroup_Btn_Options",
+	"CRB_MinimapSprites:btnMM_ToggleMenu",
+	"CRB_Raid:btnRaid_ConfigureGearIcon",
+	"QuestLogSprites:btnQuestOptions",
+
+	"BK3:UI_BK3_Metal_Inset_Block3",
+	"CRB_UIKitSprites:spr_baseframeTHIN_Hologram",
 }
 
 local ktChatNotificationStrings =
@@ -167,11 +217,17 @@ function QuestLog:Initialize()
 
 	self:DestroyAndRedraw()
 
+	local maxOptionsHeight = 500
 	local optionsHeight = 10
 	for idx, option in pairs(ktOptions) do
 		local wndOption = Apollo.LoadForm(self.xmlDoc, "OptionsItem", self.wndOptions, self)
-		wndOption:FindChild("OptionsButton"):SetData(option)
+		local wndOptionButton = wndOption:FindChild("OptionsButton")
+		wndOptionButton:SetText(option)
+		wndOptionButton:SetData(option)
     optionsHeight = optionsHeight + self.knOptionsHeight
+	end
+	if optionsHeight > maxOptionsHeight then
+		optionsHeight = maxOptionsHeight
 	end
 	local nOptionsLeft, nOptionsTop, nOptionsRight, nOptionsBottom = self.wndBGOptions:GetAnchorOffsets()
 	self.wndBGOptions:SetAnchorOffsets(nOptionsLeft, nOptionsBottom - optionsHeight, nOptionsRight, nOptionsBottom)
