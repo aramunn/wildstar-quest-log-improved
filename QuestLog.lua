@@ -166,6 +166,15 @@ function QuestLog:Initialize()
 	self.nEpisodeInfoHeight = self.wndMain:FindChild("EpisodeInfo"):GetHeight()
 
 	self:DestroyAndRedraw()
+
+	local optionsHeight = 10
+	for idx, option in pairs(ktOptions) do
+		local wndOption = self:FactoryCacheProduce(self.wndOptions, "OptionsItem", option)
+    optionsHeight = optionsHeight + self.knOptionsHeight
+	end
+	local nOptionsLeft, nOptionsTop, nOptionsRight, nOptionsBottom = self.wndBGOptions:GetAnchorOffsets()
+	self.wndBGOptions:SetAnchorOffsets(nOptionsLeft, nOptionsBottom - optionsHeight, nOptionsRight, nOptionsBottom)
+	self.wndOptions:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.Middle)
 end
 
 function QuestLog:OnGenericEvent_ShowQuestLog(queTarget)
@@ -256,15 +265,6 @@ function QuestLog:DestroyAndRedraw() -- TODO, remove as much as possible that ca
 	-- Start with no quests checked
 	self.wndQuestInfoControls:Show(false)
 	self.wndRightSide:Show(false)
-
-	local optionsHeight = 10
-	for idx, option in pairs(ktOptions) do
-		local wndOption = self:FactoryCacheProduce(self.wndOptions, "OptionsItem", option)
-    optionsHeight = optionsHeight + self.knOptionsHeight
-	end
-	local nOptionsLeft, nOptionsTop, nOptionsRight, nOptionsBottom = self.wndBGOptions:GetAnchorOffsets()
-	self.wndBGOptions:SetAnchorOffsets(nOptionsLeft, nOptionsBottom - optionsHeight, nOptionsRight, nOptionsBottom)
-	self.wndOptions:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.Middle)
 end
 
 function QuestLog:RedrawLeftTreeFromUI()
