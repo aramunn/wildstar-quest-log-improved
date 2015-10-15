@@ -384,9 +384,7 @@ function QuestLog:RedrawLeftTree()
 		strColor = "ffffb62e"
 	end
 
-	local strActiveQuests = string.format("<T TextColor=\"%s\">%s</T>", strColor, nQuestCount)
-	strActiveQuests = String_GetWeaselString(Apollo.GetString("QuestLog_ActiveQuests"), strActiveQuests, self.nQuestCountMax)
-	self.wndMain:FindChild("QuestLogCountText"):SetAML(string.format("<P Font=\"CRB_InterfaceTiny_BB\" Align=\"Left\" TextColor=\"ffffffff\">%s</P>", strActiveQuests))
+	self.wndLeftFilterActive:SetText(string.format("Active Quests (%d/%d)",nQuestCount,self.nQuestCountMax))
 
 	local activeQuestsProgressBar = self.wndLeftFilterActive:FindChild("ActiveQuestsProgressBar")
 	activeQuestsProgressBar:SetMax(self.nQuestCountMax)
