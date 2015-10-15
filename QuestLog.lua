@@ -181,6 +181,8 @@ function QuestLog:Initialize()
 	self.wndLeftFilterActive = self.wndMain:FindChild("LeftSideFilterBtnsBG:LeftSideFilterBtnShowActive")
 	self.wndLeftFilterFinished = self.wndMain:FindChild("LeftSideFilterBtnsBG:LeftSideFilterBtnShowFinished")
 	self.wndLeftFilterHidden = self.wndMain:FindChild("LeftSideFilterBtnsBG:LeftSideFilterBtnShowHidden")
+	self.wndLeftExpandAll = self.wndMain:FindChild("LeftSideFilterBtnsBG:LeftSideBtnExpandAll")
+	self.wndLeftCollapseAll = self.wndMain:FindChild("LeftSideFilterBtnsBG:LeftSideBtnCollapseAll")
 	self.wndLeftSideScroll = self.wndMain:FindChild("LeftSideScroll")
 	self.wndRightSide = self.wndMain:FindChild("RightSide")
 	self.wndQuestInfoControls = self.wndMain:FindChild("QuestInfoControls")
@@ -1446,6 +1448,12 @@ function QuestLog:OnOptionsButton(wndHandler, wndControl)
 		topLevelBtnSprite = option.optionText
 		middleLevelBtnSprite = option.optionText
 		bottomLevelBtnSprite = option.optionText
+		self.wndLeftFilterActive:ChangeArt(option.optionText)
+		self.wndLeftFilterFinished:ChangeArt(option.optionText)
+		self.wndLeftFilterHidden:ChangeArt(option.optionText)
+		self.wndLeftExpandAll:ChangeArt(option.optionText)
+		self.wndLeftCollapseAll:ChangeArt(option.optionText)
+		-- self.wndLeftSideScroll
 		self:RedrawLeftTree()
 	elseif t == ktOptionTypes.optionsSprite    then self.wndMain:FindChild("OptionsPopoutBtn"):ChangeArt(option.optionText)
 	elseif t == ktOptionTypes.backgroundSprite then self.wndMain:FindChild("LeftSideFilterBtnsBG"):SetSprite(option.optionText)
