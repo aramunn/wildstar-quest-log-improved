@@ -32,9 +32,8 @@ end
 
 local knEpisodeInfoBuffer = 10
 
--- local topLevelBtnSprite    = "BK3:btnHolo_ListView_Top"
 local topLevelBtnSprite    = "BK3:btnMetal_ExpandMenu_LargeClean"
-local middleLevelBtnSprite = "BK3:btnHolo_ListView_Simple"
+local middleLevelBtnSprite = "CRB_Basekit:kitBtn_ListHeader_Middle"
 local bottomLevelBtnSprite = "BK3:btnHolo_ListView_Mid"
 
 local ktOptionTypes = {
