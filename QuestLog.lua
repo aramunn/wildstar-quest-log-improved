@@ -34,62 +34,70 @@ local knEpisodeInfoBuffer = 10
 
 local bottomLevelBtnSprite = "BK3:btnHolo_ListView_Mid"
 
+local ktOptionTypes = {
+--@debug@
+	buttonSprite     = -1,
+	optionsSprite    = -2,
+	backgroundSprite = -3,
+--@end-debug@
+}
+
 local ktOptions =
 {
-	"CRB_Basekit:kitBtn_List_MetalContextMenu",
-	"CRB_Basekit:kitBtn_List_MetalNoEdge",
-	"BK3:btnMetal_ExpandMenu_LargeClean",
-	"BK3:btnMetal_ExpandMenu_MedClean",
-	"BK3:btnMetal_ExpandMenu_NoNav",
-	"CRB_Basekit:kitBtn_List_RightArrowHighlight",
-	"CRB_Basekit:kitBtn_ListHeader_Middle",
-	"CRB_Basekit:kitBtn_List_MetalBorder",
-	"CRB_Basekit:kitBtn_ListHeader_Top",
-	"CRB_Basekit:kitBtn_Metal_IconBase",
-	"CRB_Basekit:kitBtn_Metal_IconBaseStretch",
-	"CRB_CharacterCreateSprites:btnCharS_ListEntryNorm",
-	"CRB_DatachronSprites:btnDCM_DataMenu",
-	"CRB_DatachronSprites:btnDCPP_ExPlace",
-	"CRB_PlayerPathSprites:btnPP_BaseGrey",
-	"CRB_UIKitSprites:btn_listBG",
-	"CRB_UIKitSprites:btn_listBGTALL",
-	"OldMetalSprites:OldMetalGrid",
-	"OldMetalSprites:OldMetalGridHeader",
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_List_MetalContextMenu" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_List_MetalNoEdge" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "BK3:btnMetal_ExpandMenu_LargeClean" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "BK3:btnMetal_ExpandMenu_MedClean" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "BK3:btnMetal_ExpandMenu_NoNav" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_List_RightArrowHighlight" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_ListHeader_Middle" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_List_MetalBorder" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_ListHeader_Top" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_Metal_IconBase" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_Metal_IconBaseStretch" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_CharacterCreateSprites:btnCharS_ListEntryNorm" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_DatachronSprites:btnDCM_DataMenu" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_DatachronSprites:btnDCPP_ExPlace" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_PlayerPathSprites:btnPP_BaseGrey" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_UIKitSprites:btn_listBG" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_UIKitSprites:btn_listBGTALL" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "OldMetalSprites:OldMetalGrid" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "OldMetalSprites:OldMetalGridHeader" },
 
-	"CRB_Basekit:kitBtn_Metal",
-	"CRB_Basekit:kitBtn_Metal_LargeBlue",
-	"CRB_Basekit:kitBtn_Metal_LargeBlueStretch",
-	"CRB_Basekit:kitBtn_Metal_MediumBlue",
-	"CRB_Basekit:kitBtn_Metal_MediumBlueStretch",
-	"CRB_PlayerPathSprites:btnPP_SciListEntry",
-	"CRB_Tradeskills:btnSchemCraft",
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_Metal" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_Metal_LargeBlue" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_Metal_LargeBlueStretch" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_Metal_MediumBlue" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_Metal_MediumBlueStretch" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_PlayerPathSprites:btnPP_SciListEntry" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Tradeskills:btnSchemCraft" },
 
-	"BK3:btnHolo_Btn_Mega",
-	"Contracts:btnContracts_CheckBox",
-	"CRB_Basekit:kitBtn_Holo",
-	"CRB_Basekit:kitBtn_Holo_Large",
-	"CRB_Basekit:kitBtn_List_Holo",
-	"CRB_HousingSprites:btnHologramRedfill",
-	"CRB_HousingSprites:btnPropertyMarker",
-	"CRB_PlayerPathSprites:btnPP_BaseBlue",
-	"CRB_PlayerPathSprites:btnPP_HologramBase",
-	"CRB_QuestTrackerSprites:btnQT_ScrollScroller",
-	"CRB_Raid:btnRaid_ThinHoloBlueBtn",
-	"CRB_TechTree:CRB_TechTree_BlueBtn",
-	"HUD_BottomBar:btn_HUD_MenuIconBtn",
-	"QuestLogSprites:btnQuestBlue",
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "BK3:btnHolo_Btn_Mega" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "Contracts:btnContracts_CheckBox" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_Holo" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_Holo_Large" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_List_Holo" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_HousingSprites:btnHologramRedfill" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_HousingSprites:btnPropertyMarker" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_PlayerPathSprites:btnPP_BaseBlue" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_PlayerPathSprites:btnPP_HologramBase" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_QuestTrackerSprites:btnQT_ScrollScroller" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Raid:btnRaid_ThinHoloBlueBtn" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_TechTree:CRB_TechTree_BlueBtn" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "HUD_BottomBar:btn_HUD_MenuIconBtn" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "QuestLogSprites:btnQuestBlue" },
 
-	"AbilitiesSprites:btn_Options",
-	"ChatLogSprites:CombatLogSettingsBtn",
-	"CRB_Basekit:kitBtn_Metal_Options",
-	"CRB_DatachronSprites:btnDCPP_SciConfig",
-	"CRB_GroupFrame:sprGroup_Btn_Options",
-	"CRB_MinimapSprites:btnMM_ToggleMenu",
-	"CRB_Raid:btnRaid_ConfigureGearIcon",
-	"QuestLogSprites:btnQuestOptions",
+	{ optionType = ktOptionTypes.optionsSprite, optionText = "AbilitiesSprites:btn_Options" },
+	{ optionType = ktOptionTypes.optionsSprite, optionText = "ChatLogSprites:CombatLogSettingsBtn" },
+	{ optionType = ktOptionTypes.optionsSprite, optionText = "CRB_Basekit:kitBtn_Metal_Options" },
+	{ optionType = ktOptionTypes.optionsSprite, optionText = "CRB_DatachronSprites:btnDCPP_SciConfig" },
+	{ optionType = ktOptionTypes.optionsSprite, optionText = "CRB_GroupFrame:sprGroup_Btn_Options" },
+	{ optionType = ktOptionTypes.optionsSprite, optionText = "CRB_MinimapSprites:btnMM_ToggleMenu" },
+	{ optionType = ktOptionTypes.optionsSprite, optionText = "CRB_Raid:btnRaid_ConfigureGearIcon" },
+	{ optionType = ktOptionTypes.optionsSprite, optionText = "QuestLogSprites:btnQuestOptions" },
 
-	"BK3:UI_BK3_Metal_Inset_Block3",
-	"CRB_UIKitSprites:spr_baseframeTHIN_Hologram",
+	{ optionType = ktOptionTypes.backgroundSprite, optionText = "BK3:UI_BK3_Metal_Inset_Block3" },
+	{ optionType = ktOptionTypes.backgroundSprite, optionText = "CRB_UIKitSprites:spr_baseframeTHIN_Hologram" },
 }
 
 local ktChatNotificationStrings =
@@ -224,9 +232,9 @@ function QuestLog:Initialize()
 	for idx, option in pairs(ktOptions) do
 		local wndOption = Apollo.LoadForm(self.xmlDoc, "OptionsItem", self.wndOptions, self)
 		local wndOptionButton = wndOption:FindChild("OptionsButton")
-		wndOptionButton:SetText(option)
+		wndOptionButton:SetText(option.optionText)
 		wndOptionButton:SetData(option)
-		wndOptionButton:ChangeArt(option)
+		wndOptionButton:ChangeArt(option.optionText)
     optionsHeight = optionsHeight + self.knOptionsHeight
 	end
 	if optionsHeight > maxOptionsHeight then
@@ -1416,9 +1424,12 @@ end
 
 function QuestLog:OnOptionsButton(wndHandler, wndControl)
 	local option = wndHandler:GetData()
-	Print("Option: "..option)
-	bottomLevelBtnSprite = option
-	self:RedrawLeftTree()
+	Print("Option: "..option.optionText.." ("..option.optionType..")")
+	local t = option.optionType
+	if     t == ktOptionTypes.buttonSprite     then bottomLevelBtnSprite = option.optionText; self:RedrawLeftTree()
+	elseif t == ktOptionTypes.optionsSprite    then self.wndMain:FindChild("OptionsPopoutBtn"):ChangeArt(option.optionText)
+	elseif t == ktOptionTypes.backgroundSprite then self.wndMain:FindChild("LeftSideFilterBtnsBG"):SetSprite(option.optionText)
+	else Print("QuestLogImproved: unknown option type "..t) end
 end
 
 local QuestLogInst = QuestLog:new()
