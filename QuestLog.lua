@@ -612,13 +612,11 @@ end
 
 function QuestLog:HelperSetupBottomLevelWindow(wndBot, queQuest)
 	local wndBottomLevelBtn = wndBot:FindChild("BottomLevelBtn")
-	local wndBottomLevelBtnText = wndBot:FindChild("BottomLevelBtnText")
 
 	local bOptionalQuest = queQuest:IsOptionalForEpisode(queQuest:GetEpisode():GetId())
 	wndBottomLevelBtn:ChangeArt(bottomLevelBtnSprite)
 	questText = bOptionalQuest and String_GetWeaselString(Apollo.GetString("QuestLog_OptionalAppend"), queQuest:GetTitle()) or queQuest:GetTitle()
 	questText = " ["..queQuest:GetConLevel().."] "..questText
-	wndBottomLevelBtnText:SetText(questText)
 	wndBottomLevelBtn:SetText(questText)
 	wndBottomLevelBtn:SetData(queQuest)
 
