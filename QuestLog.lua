@@ -226,6 +226,7 @@ function QuestLog:Initialize()
 		local wndOptionButton = wndOption:FindChild("OptionsButton")
 		wndOptionButton:SetText(option)
 		wndOptionButton:SetData(option)
+		wndOptionButton:ChangeArt(option)
     optionsHeight = optionsHeight + self.knOptionsHeight
 	end
 	if optionsHeight > maxOptionsHeight then
