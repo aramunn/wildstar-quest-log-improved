@@ -46,25 +46,25 @@ local ktOptionTypes = {
 
 local ktOptions =
 {
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_List_MetalContextMenu" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_List_MetalNoEdge" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_List_MetalBorder" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_ListHeader_Top" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_ListHeader_Middle" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_UIKitSprites:btn_listBG" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "OldMetalSprites:OldMetalGridHeader" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "OldMetalSprites:OldMetalGrid" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "BK3:btnMetal_ExpandMenu_LargeClean" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "BK3:btnMetal_ExpandMenu_MedClean" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "BK3:btnMetal_ExpandMenu_NoNav" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_List_MetalNoEdge" },
+	
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_List_RightArrowHighlight" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_ListHeader_Middle" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_List_MetalBorder" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_ListHeader_Top" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_Metal_IconBase" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_Metal_IconBaseStretch" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_CharacterCreateSprites:btnCharS_ListEntryNorm" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_DatachronSprites:btnDCM_DataMenu" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_DatachronSprites:btnDCPP_ExPlace" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_PlayerPathSprites:btnPP_BaseGrey" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_UIKitSprites:btn_listBG" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_UIKitSprites:btn_listBGTALL" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "OldMetalSprites:OldMetalGrid" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "OldMetalSprites:OldMetalGridHeader" },
 
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_Metal" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_Metal_LargeBlue" },
