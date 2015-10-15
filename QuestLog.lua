@@ -34,7 +34,7 @@ local knEpisodeInfoBuffer = 10
 
 local topLevelBtnSprite    = "BK3:btnMetal_ExpandMenu_LargeClean"
 local middleLevelBtnSprite = "CRB_Basekit:kitBtn_ListHeader_Middle"
-local bottomLevelBtnSprite = "BK3:btnHolo_ListView_Mid"
+local bottomLevelBtnSprite = "BK3:btnMetal_ExpandMenu_MedClean"
 
 local ktOptionTypes = {
 --@debug@
@@ -680,7 +680,7 @@ function QuestLog:ResizeTree()
 				local nMiddleItemsHeight = wndMiddleLevelItems:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop)
 				if nMiddleItemsHeight > 0 then
 					lastChildHasItems = true
-					nMiddleItemsHeight = nMiddleItemsHeight + 4
+					nMiddleItemsHeight = nMiddleItemsHeight + 1
 				else
 					lastChildHasItems = false
 					nMiddleItemsHeight = nMiddleItemsHeight - 2
@@ -695,9 +695,9 @@ function QuestLog:ResizeTree()
 
 		local nTopItemsHeight = wndTopLevelItems:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop, function(a,b) return a:GetData() > b:GetData() end) -- Tasks to bottom
 		if nTopItemsHeight > 0 then
-			nTopItemsHeight = nTopItemsHeight + 1
+			nTopItemsHeight = nTopItemsHeight + 4
 			if lastChildHasItems then
-				nTopItemsHeight = nTopItemsHeight - 5
+				nTopItemsHeight = nTopItemsHeight - 4
 			end
 		else
 			nTopItemsHeight = nTopItemsHeight + 1
