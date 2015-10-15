@@ -656,6 +656,7 @@ function QuestLog:ResizeTree()
 		local wndTopLevelBtn = wndTop:FindChild("TopLevelBtn")
 		local wndTopLevelItems = wndTop:FindChild("TopLevelItems")
 
+		local lastChildHasItems = false
 		if wndTopLevelBtn:IsChecked() then
 			wndDeepestSelected = wndTop
 			for idx2, wndMiddle in pairs(wndTopLevelItems:GetChildren()) do
@@ -673,21 +674,33 @@ function QuestLog:ResizeTree()
 					end
 				end
 
-				local nItemHeights = wndMiddleLevelItems:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop)
-				if nItemHeights > 0 then
-					nItemHeights = nItemHeights + 3
+				local nMiddleItemsHeight = wndMiddleLevelItems:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop)
+				if nMiddleItemsHeight > 0 then
+					lastChildHasItems = true
+					nMiddleItemsHeight = nMiddleItemsHeight + 4
+				else
+					lastChildHasItems = false
+					nMiddleItemsHeight = nMiddleItemsHeight - 2
 				end
 
 				local nMiddleLeft, nMiddleTop, nMiddleRight, nMiddleBottom = wndMiddle:GetAnchorOffsets()
-				wndMiddle:SetAnchorOffsets(nMiddleLeft, nMiddleTop, nMiddleRight, nMiddleTop + self.knMiddleLevelHeight + nItemHeights)
+				wndMiddle:SetAnchorOffsets(nMiddleLeft, nMiddleTop, nMiddleRight, nMiddleTop + self.knMiddleLevelHeight + nMiddleItemsHeight)
 			end
 		else
 			wndTopLevelItems:DestroyChildren()
 		end
 
-		local nItemHeights = wndTopLevelItems:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop, function(a,b) return a:GetData() > b:GetData() end) -- Tasks to bottom
+		local nTopItemsHeight = wndTopLevelItems:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop, function(a,b) return a:GetData() > b:GetData() end) -- Tasks to bottom
+		if nTopItemsHeight > 0 then
+			nTopItemsHeight = nTopItemsHeight + 1
+			if lastChildHasItems then
+				nTopItemsHeight = nTopItemsHeight - 5
+			end
+		else
+			nTopItemsHeight = nTopItemsHeight - 4
+		end
 		local nTopLeft, nTopTop, nTopRight, nTopBottom = wndTop:GetAnchorOffsets()
-		wndTop:SetAnchorOffsets(nTopLeft, nTopTop, nTopRight, nTopTop + self.knTopLevelHeight + nItemHeights)
+		wndTop:SetAnchorOffsets(nTopLeft, nTopTop, nTopRight, nTopTop + self.knTopLevelHeight + nTopItemsHeight)
 	end
 
 	self.wndLeftSideScroll:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop)
