@@ -32,7 +32,8 @@ end
 
 local knEpisodeInfoBuffer = 10
 
-local topLevelBtnSprite    = "BK3:btnHolo_ListView_Top"
+-- local topLevelBtnSprite    = "BK3:btnHolo_ListView_Top"
+local topLevelBtnSprite    = "BK3:btnMetal_ExpandMenu_LargeClean"
 local middleLevelBtnSprite = "BK3:btnHolo_ListView_Simple"
 local bottomLevelBtnSprite = "BK3:btnHolo_ListView_Mid"
 
@@ -74,15 +75,16 @@ local ktOptions =
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_PlayerPathSprites:btnPP_SciListEntry" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Tradeskills:btnSchemCraft" },
 
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_PlayerPathSprites:btnPP_HologramBase" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "BK3:btnHolo_ListView_Top" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_List_Holo" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "BK3:btnHolo_Btn_Mega" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "Contracts:btnContracts_CheckBox" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_Holo" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_Holo_Large" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_List_Holo" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_HousingSprites:btnHologramRedfill" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_HousingSprites:btnPropertyMarker" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_PlayerPathSprites:btnPP_BaseBlue" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_PlayerPathSprites:btnPP_HologramBase" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_QuestTrackerSprites:btnQT_ScrollScroller" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Raid:btnRaid_ThinHoloBlueBtn" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_TechTree:CRB_TechTree_BlueBtn" },
@@ -699,7 +701,7 @@ function QuestLog:ResizeTree()
 				nTopItemsHeight = nTopItemsHeight - 5
 			end
 		else
-			nTopItemsHeight = nTopItemsHeight - 4
+			nTopItemsHeight = nTopItemsHeight + 1
 		end
 		local nTopLeft, nTopTop, nTopRight, nTopBottom = wndTop:GetAnchorOffsets()
 		wndTop:SetAnchorOffsets(nTopLeft, nTopTop, nTopRight, nTopTop + self.knTopLevelHeight + nTopItemsHeight)
