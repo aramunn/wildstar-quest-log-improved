@@ -32,6 +32,8 @@ end
 
 local knEpisodeInfoBuffer = 10
 
+local topLevelBtnSprite    = "BK3:btnHolo_ListView_Top"
+local middleLevelBtnSprite = "BK3:btnHolo_ListView_Simple"
 local bottomLevelBtnSprite = "BK3:btnHolo_ListView_Mid"
 
 local ktOptionTypes = {
@@ -87,13 +89,10 @@ local ktOptions =
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "HUD_BottomBar:btn_HUD_MenuIconBtn" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "QuestLogSprites:btnQuestBlue" },
 
-	{ optionType = ktOptionTypes.optionsSprite, optionText = "AbilitiesSprites:btn_Options" },
-	{ optionType = ktOptionTypes.optionsSprite, optionText = "ChatLogSprites:CombatLogSettingsBtn" },
 	{ optionType = ktOptionTypes.optionsSprite, optionText = "CRB_Basekit:kitBtn_Metal_Options" },
 	{ optionType = ktOptionTypes.optionsSprite, optionText = "CRB_DatachronSprites:btnDCPP_SciConfig" },
 	{ optionType = ktOptionTypes.optionsSprite, optionText = "CRB_GroupFrame:sprGroup_Btn_Options" },
 	{ optionType = ktOptionTypes.optionsSprite, optionText = "CRB_MinimapSprites:btnMM_ToggleMenu" },
-	{ optionType = ktOptionTypes.optionsSprite, optionText = "CRB_Raid:btnRaid_ConfigureGearIcon" },
 	{ optionType = ktOptionTypes.optionsSprite, optionText = "QuestLogSprites:btnQuestOptions" },
 
 	{ optionType = ktOptionTypes.backgroundSprite, optionText = "BK3:UI_BK3_Metal_Inset_Block3" },
@@ -551,6 +550,7 @@ function QuestLog:RedrawLeftTree()
 				for idx2, epiEpisode in pairs(arEpisodes[strCategoryKey]) do
 					local strEpisodeKey = strCategoryKey.."E"..epiEpisode:GetId()
 					local wndMiddle = self:FactoryCacheProduce(wndTopLevelItems, "MiddleLevelItem", strEpisodeKey)
+					wndMiddle:FindChild("MiddleLevelBtn"):ChangeArt(middleLevelBtnSprite)
 					self:HelperSetupMiddleLevelWindow(wndMiddle, epiEpisode)
 
 					if epiEpisode:IsZoneStory() then
@@ -564,6 +564,7 @@ function QuestLog:RedrawLeftTree()
 			if bHasTasks[strCategoryKey] then
 				local strEpisodeKey = strCategoryKey.."ETasks"
 				local wndMiddle = self:FactoryCacheProduce(wndTopLevelItems, "MiddleLevelItem", strEpisodeKey)
+				wndMiddle:FindChild("MiddleLevelBtn"):ChangeArt(middleLevelBtnSprite)
 				self:HelperSetupFakeMiddleLevelWindow(wndMiddle, Apollo.GetString("QuestLog_Tasks"))
 				wndMiddle:SetData("")
 
@@ -575,14 +576,18 @@ function QuestLog:RedrawLeftTree()
 	if bWorldStoryHasData then
 		local strCategoryKey = "CWorldStory"
 		local wndTop = self:FactoryCacheProduce(self.wndLeftSideScroll, "TopLevelItem", strCategoryKey)
-		wndTop:FindChild("TopLevelBtn"):SetText(Apollo.GetString("QuestLog_WorldStory"))
+		local wndTopBtn = wndTop:FindChild("TopLevelBtn")
+		wndTopBtn:ChangeArt(topLevelBtnSprite)
+		wndTopBtn:SetText(Apollo.GetString("QuestLog_WorldStory"))
 		fnBuildCategoryEpisodes(strCategoryKey, wndTop)
 	end
 
 	for idx1, qcCategory in pairs(arCategories) do
 		local strCategoryKey = "C"..qcCategory:GetId()
 		local wndTop = self:FactoryCacheProduce(self.wndLeftSideScroll, "TopLevelItem", strCategoryKey)
-		wndTop:FindChild("TopLevelBtn"):SetText(qcCategory:GetTitle())
+		local wndTopBtn = wndTop:FindChild("TopLevelBtn")
+		wndTopBtn:ChangeArt(topLevelBtnSprite)
+		wndTopBtn:SetText(qcCategory:GetTitle())
 		fnBuildCategoryEpisodes(strCategoryKey, wndTop)
 	end
 end
@@ -1426,7 +1431,11 @@ function QuestLog:OnOptionsButton(wndHandler, wndControl)
 	local option = wndHandler:GetData()
 	Print("Option: "..option.optionText.." ("..option.optionType..")")
 	local t = option.optionType
-	if     t == ktOptionTypes.buttonSprite     then bottomLevelBtnSprite = option.optionText; self:RedrawLeftTree()
+	if     t == ktOptionTypes.buttonSprite     then
+		topLevelBtnSprite = option.optionText
+		middleLevelBtnSprite = option.optionText
+		bottomLevelBtnSprite = option.optionText
+		self:RedrawLeftTree()
 	elseif t == ktOptionTypes.optionsSprite    then self.wndMain:FindChild("OptionsPopoutBtn"):ChangeArt(option.optionText)
 	elseif t == ktOptionTypes.backgroundSprite then self.wndMain:FindChild("LeftSideFilterBtnsBG"):SetSprite(option.optionText)
 	else Print("QuestLogImproved: unknown option type "..t) end
