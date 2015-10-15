@@ -597,7 +597,7 @@ end
 
 function QuestLog:HelperSetupMiddleLevelWindow(wndMiddle, epiEpisode)
 	local tEpisodeProgress = epiEpisode:GetProgress()
-	wndMiddle:FindChild("MiddleLevelBtnText"):SetText(epiEpisode:GetTitle())
+	wndMiddle:FindChild("MiddleLevelBtn"):SetText("        "..epiEpisode:GetTitle())
 	wndMiddle:FindChild("MiddleLevelProgBar"):SetMax(tEpisodeProgress.nTotal)
 	wndMiddle:FindChild("MiddleLevelProgBar"):SetProgress(tEpisodeProgress.nCompleted)
 	wndMiddle:FindChild("MiddleLevelIcon"):SetTooltip(self.wndLeftFilterFinished:IsChecked() and "" or Apollo.GetString("QuestLog_MoreQuestsToComplete"))
@@ -606,7 +606,7 @@ end
 
 function QuestLog:HelperSetupFakeMiddleLevelWindow(wndMiddle, strText)
 	local tEpisodeProgress = { nTotal = 100, nCompleted = 0 }
-	wndMiddle:FindChild("MiddleLevelBtnText"):SetText(strText)
+	wndMiddle:FindChild("MiddleLevelBtn"):SetText("        "..strText)
 	wndMiddle:FindChild("MiddleLevelProgBar"):SetMax(tEpisodeProgress.nTotal)
 	wndMiddle:FindChild("MiddleLevelProgBar"):SetProgress(tEpisodeProgress.nCompleted)
 	wndMiddle:FindChild("MiddleLevelIcon"):SetTooltip(self.wndLeftFilterFinished:IsChecked() and "" or Apollo.GetString("QuestLog_MoreQuestsToComplete"))
