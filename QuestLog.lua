@@ -56,6 +56,12 @@ local ktOptionTypes = {
 
 local ktOptions =
 {
+	{ optionType = 0, optionText = "CRB_Basekit:kitBtn_Metal_Options" },
+	
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "BK3:btnHolo_ListView_Top" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "BK3:btnHolo_ListView_Simple" },
+	{ optionType = ktOptionTypes.buttonSprite, optionText = "BK3:btnHolo_ListView_Mid" },
+	
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_CharacterCreateSprites:btnCharS_ListEntryNorm" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_DatachronSprites:btnDCM_DataMenu" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_DatachronSprites:btnDCPP_ExPlace" },
@@ -1453,7 +1459,18 @@ function QuestLog:OnOptionsButton(wndHandler, wndControl)
 		self:RedrawLeftTree()
 	elseif t == ktOptionTypes.optionsSprite    then self.wndMain:FindChild("OptionsPopoutBtn"):ChangeArt(option.optionText)
 	elseif t == ktOptionTypes.backgroundSprite then self.wndMain:FindChild("LeftSideFilterBtnsBG"):SetSprite(option.optionText)
+	elseif t == 0 then self:SwitchTheme()
 	else Print("QuestLogImproved: unknown option type "..t) end
+end
+
+local theme = true
+function QuestLog:SwitchTheme()
+	theme = not theme
+	if theme then
+		Print("theme 1")
+	else
+		Print("theme 2")
+	end
 end
 
 local QuestLogInst = QuestLog:new()
