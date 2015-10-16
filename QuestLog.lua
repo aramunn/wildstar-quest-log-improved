@@ -32,13 +32,15 @@ end
 
 local knEpisodeInfoBuffer = 10
 
-local topLevelBtnSprite    = "BK3:btnMetal_ExpandMenu_LargeClean"
-local middleLevelBtnSprite = "CRB_Basekit:kitBtn_ListHeader_Middle"
-local bottomLevelBtnSprite = "BK3:btnMetal_ExpandMenu_MedClean"
+local topLevelBtnSprite      = "BK3:btnMetal_ExpandMenu_LargeClean"
+local middleLevelBtnSprite   = "CRB_Basekit:kitBtn_ListHeader_Middle"
+local bottomLevelBtnSprite   = "BK3:btnMetal_ExpandMenu_MedClean"
+local quickTrackBtnBtnSprite = "BK3:btnMetal_Check_small"
 
-local topLevelBtnSprite    = "BK3:btnHolo_ListView_Top"
-local middleLevelBtnSprite = "CRB_Basekit:kitBtn_List_Holo"
-local bottomLevelBtnSprite = "BK3:btnHolo_ListView_Simple"
+local topLevelBtnSprite      = "BK3:btnHolo_ListView_Top"
+local middleLevelBtnSprite   = "CRB_Basekit:kitBtn_List_Holo"
+local bottomLevelBtnSprite   = "BK3:btnHolo_ListView_Simple"
+local quickTrackBtnBtnSprite = "BK3:btnHolo_Check_small"
 
 local middleLevelBtnAnchorOffsets = { -3, -2,  5, 24 }
 local bottomLevelBtnAnchorOffsets = { 22,  0, -3, 21 }
@@ -642,6 +644,7 @@ function QuestLog:HelperSetupBottomLevelWindow(wndBot, queQuest)
 	local wndQuickTrackBtn = wndBot:FindChild("QuickTrackBtn")
 	local wndBottomItemTree = wndBot:FindChild("Tree")
 	local bIsTracked = queQuest:IsTracked()
+	wndQuickTrackBtn:ChangeArt(quickTrackBtnBtnSprite)
 	wndQuickTrackBtn:SetCheck(bIsTracked)
 	wndQuickTrackBtn:Enable(eState ~= Quest.QuestState_Botched)
 	-- Only show if quest is active
