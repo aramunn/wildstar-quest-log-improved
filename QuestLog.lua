@@ -43,8 +43,8 @@ local bottomLevelBtnSprite = "BK3:btnMetal_ExpandMenu_MedClean"
 local middleLevelBtnAnchorOffsets = { -3, -2,  5, 24 }
 local bottomLevelBtnAnchorOffsets = { 22,  0, -3, 21 }
 
-local middleLevelBtnAnchorOffsets = { -3, -2,  5, 24 }
-local bottomLevelBtnAnchorOffsets = { 22,  0, -3, 21 }
+-- local middleLevelBtnAnchorOffsets = {  0,  0,  0, 23 }
+-- local bottomLevelBtnAnchorOffsets = {  0,  0,  0, 21 }
 
 local ktOptionTypes = {
 --@debug@
