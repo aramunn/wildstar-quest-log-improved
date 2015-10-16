@@ -36,11 +36,13 @@ local topLevelBtnSprite      = "BK3:btnMetal_ExpandMenu_LargeClean"
 local middleLevelBtnSprite   = "CRB_Basekit:kitBtn_ListHeader_Middle"
 local bottomLevelBtnSprite   = "BK3:btnMetal_ExpandMenu_MedClean"
 local quickTrackBtnBtnSprite = "BK3:btnMetal_Check_small"
+local leftSideBtnsSprite     = "CRB_UIKitSprites:btn_listBG"
 
 local topLevelBtnSprite      = "BK3:btnHolo_ListView_Top"
 local middleLevelBtnSprite   = "CRB_Basekit:kitBtn_List_Holo"
 local bottomLevelBtnSprite   = "BK3:btnHolo_ListView_Simple"
 local quickTrackBtnBtnSprite = "BK3:btnHolo_Check_small"
+local leftSideBtnsSprite     = "CRB_PlayerPathSprites:btnPP_HologramBase"
 
 local middleLevelBtnAnchorOffsets = { -3, -2,  5, 24 }
 local bottomLevelBtnAnchorOffsets = { 22,  0, -3, 21 }
@@ -1457,16 +1459,16 @@ function QuestLog:OnOptionsButton(wndHandler, wndControl)
 	Print("Option: "..option.optionText.." ("..option.optionType..")")
 	local t = option.optionType
 	if t == ktOptionTypes.buttonSprite then
-		topLevelBtnSprite = option.optionText
-		middleLevelBtnSprite = option.optionText
-		bottomLevelBtnSprite = option.optionText
+		-- topLevelBtnSprite = option.optionText
+		-- middleLevelBtnSprite = option.optionText
+		-- bottomLevelBtnSprite = option.optionText
 		self.wndLeftFilterActive:ChangeArt(option.optionText)
 		self.wndLeftFilterFinished:ChangeArt(option.optionText)
 		self.wndLeftFilterHidden:ChangeArt(option.optionText)
 		self.wndLeftExpandAll:ChangeArt(option.optionText)
 		self.wndLeftCollapseAll:ChangeArt(option.optionText)
 		-- self.wndLeftSideScroll
-		self:RedrawLeftTree()
+		-- self:RedrawLeftTree()
 	elseif t == ktOptionTypes.optionsSprite    then self.wndMain:FindChild("OptionsPopoutBtn"):ChangeArt(option.optionText)
 	elseif t == ktOptionTypes.backgroundSprite then self.wndMain:FindChild("LeftSideFilterBtnsBG"):SetSprite(option.optionText)
 	elseif t == 0 then self:SwitchTheme()
