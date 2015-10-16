@@ -36,6 +36,16 @@ local topLevelBtnSprite    = "BK3:btnMetal_ExpandMenu_LargeClean"
 local middleLevelBtnSprite = "CRB_Basekit:kitBtn_ListHeader_Middle"
 local bottomLevelBtnSprite = "BK3:btnMetal_ExpandMenu_MedClean"
 
+-- local topLevelBtnSprite    = "BK3:btnHolo_ListView_Top"
+-- local middleLevelBtnSprite = "CRB_Basekit:kitBtn_List_Holo"
+-- local bottomLevelBtnSprite = "BK3:btnHolo_ListView_Simple"
+
+local middleLevelBtnAnchorOffsets = { -3, -2,  5, 24 }
+local bottomLevelBtnAnchorOffsets = { 22,  0, -3, 21 }
+
+local middleLevelBtnAnchorOffsets = { -3, -2,  5, 24 }
+local bottomLevelBtnAnchorOffsets = { 22,  0, -3, 21 }
+
 local ktOptionTypes = {
 --@debug@
 	buttonSprite     = -1,
@@ -574,7 +584,10 @@ end
 
 function QuestLog:HelperSetupMiddleLevelWindow(wndMiddle, epiEpisode)
 	local tEpisodeProgress = epiEpisode:GetProgress()
-	wndMiddle:FindChild("MiddleLevelBtn"):SetText("        "..epiEpisode:GetTitle())
+	local wndMiddleLevelBtn = wndMiddle:FindChild("MiddleLevelBtn")
+	local a = middleLevelBtnAnchorOffsets
+	wndMiddleLevelBtn:SetAnchorOffsets(a[1], a[2], a[3], a[4])
+	wndMiddleLevelBtn:SetText("        "..epiEpisode:GetTitle())
 	wndMiddle:FindChild("MiddleLevelProgBar"):SetMax(tEpisodeProgress.nTotal)
 	wndMiddle:FindChild("MiddleLevelProgBar"):SetProgress(tEpisodeProgress.nCompleted)
 	wndMiddle:FindChild("MiddleLevelIcon"):SetTooltip(self.wndLeftFilterFinished:IsChecked() and "" or Apollo.GetString("QuestLog_MoreQuestsToComplete"))
@@ -583,7 +596,10 @@ end
 
 function QuestLog:HelperSetupFakeMiddleLevelWindow(wndMiddle, strText)
 	local tEpisodeProgress = { nTotal = 100, nCompleted = 0 }
-	wndMiddle:FindChild("MiddleLevelBtn"):SetText("        "..strText)
+	local wndMiddleLevelBtn = wndMiddle:FindChild("MiddleLevelBtn")
+	local a = middleLevelBtnAnchorOffsets
+	wndMiddleLevelBtn:SetAnchorOffsets(a[1], a[2], a[3], a[4])
+	wndMiddleLevelBtn:SetText("        "..strText)
 	wndMiddle:FindChild("MiddleLevelProgBar"):SetMax(tEpisodeProgress.nTotal)
 	wndMiddle:FindChild("MiddleLevelProgBar"):SetProgress(tEpisodeProgress.nCompleted)
 	wndMiddle:FindChild("MiddleLevelIcon"):SetTooltip(self.wndLeftFilterFinished:IsChecked() and "" or Apollo.GetString("QuestLog_MoreQuestsToComplete"))
@@ -592,6 +608,9 @@ end
 
 function QuestLog:HelperSetupBottomLevelWindow(wndBot, queQuest)
 	local wndBottomLevelBtn = wndBot:FindChild("BottomLevelBtn")
+	
+	local a = bottomLevelBtnAnchorOffsets
+	wndBottomLevelBtn:SetAnchorOffsets(a[1], a[2], a[3], a[4])
 
 	local bOptionalQuest = queQuest:IsOptionalForEpisode(queQuest:GetEpisode():GetId())
 	wndBottomLevelBtn:ChangeArt(bottomLevelBtnSprite)
@@ -1050,7 +1069,6 @@ end
 
 function QuestLog:OnMiddleLevelBtnCheck(wndHandler, wndControl)
 	local nScrollPos = self.wndLeftSideScroll:GetVScrollPos()
-	wndHandler:SetCheck(true)
 	self:RedrawLeftTree()
 	self:ResizeTree()
 	self.wndLeftSideScroll:SetVScrollPos(nScrollPos)
@@ -1422,7 +1440,7 @@ function QuestLog:OnOptionsButton(wndHandler, wndControl)
 	local option = wndHandler:GetData()
 	Print("Option: "..option.optionText.." ("..option.optionType..")")
 	local t = option.optionType
-	if     t == ktOptionTypes.buttonSprite     then
+	if t == ktOptionTypes.buttonSprite then
 		topLevelBtnSprite = option.optionText
 		middleLevelBtnSprite = option.optionText
 		bottomLevelBtnSprite = option.optionText
