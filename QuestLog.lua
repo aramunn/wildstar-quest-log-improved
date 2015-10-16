@@ -48,6 +48,12 @@ local bottomLevelBtnAnchorOffsets = { 22,  0, -3, 21 }
 local middleLevelBtnAnchorOffsets = {  0,  0,  0, 22 }
 local bottomLevelBtnAnchorOffsets = { 22,  0,  0, 21 }
 
+local topLevelItemsCorrection    = {  0,  4,  1 }
+local middleLevelItemsCorrection = {  1, -2 }
+
+local topLevelItemsCorrection    = {  0,  4,  1 }
+local middleLevelItemsCorrection = {  1, -2 }
+
 local ktOptionTypes = {
 --@debug@
 	buttonSprite     = -1,
@@ -685,10 +691,10 @@ function QuestLog:ResizeTree()
 				local nMiddleItemsHeight = wndMiddleLevelItems:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop)
 				if nMiddleItemsHeight > 0 then
 					lastChildHasItems = true
-					nMiddleItemsHeight = nMiddleItemsHeight + 1
+					nMiddleItemsHeight = nMiddleItemsHeight + middleLevelItemsCorrection[1]
 				else
 					lastChildHasItems = false
-					nMiddleItemsHeight = nMiddleItemsHeight - 2
+					nMiddleItemsHeight = nMiddleItemsHeight + middleLevelItemsCorrection[2]
 				end
 
 				local nMiddleLeft, nMiddleTop, nMiddleRight, nMiddleBottom = wndMiddle:GetAnchorOffsets()
@@ -700,12 +706,13 @@ function QuestLog:ResizeTree()
 
 		local nTopItemsHeight = wndTopLevelItems:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop, function(a,b) return a:GetData() > b:GetData() end) -- Tasks to bottom
 		if nTopItemsHeight > 0 then
-			nTopItemsHeight = nTopItemsHeight + 4
 			if lastChildHasItems then
-				nTopItemsHeight = nTopItemsHeight - 4
+				nTopItemsHeight = nTopItemsHeight + topLevelItemsCorrection[1]
+			else
+				nTopItemsHeight = nTopItemsHeight + topLevelItemsCorrection[2]
 			end
 		else
-			nTopItemsHeight = nTopItemsHeight + 1
+			nTopItemsHeight = nTopItemsHeight + topLevelItemsCorrection[3]
 		end
 		local nTopLeft, nTopTop, nTopRight, nTopBottom = wndTop:GetAnchorOffsets()
 		wndTop:SetAnchorOffsets(nTopLeft, nTopTop, nTopRight, nTopTop + self.knTopLevelHeight + nTopItemsHeight)
