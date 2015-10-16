@@ -36,15 +36,15 @@ local topLevelBtnSprite    = "BK3:btnMetal_ExpandMenu_LargeClean"
 local middleLevelBtnSprite = "CRB_Basekit:kitBtn_ListHeader_Middle"
 local bottomLevelBtnSprite = "BK3:btnMetal_ExpandMenu_MedClean"
 
--- local topLevelBtnSprite    = "BK3:btnHolo_ListView_Top"
--- local middleLevelBtnSprite = "CRB_Basekit:kitBtn_List_Holo"
--- local bottomLevelBtnSprite = "BK3:btnHolo_ListView_Simple"
+local topLevelBtnSprite    = "BK3:btnHolo_ListView_Top"
+local middleLevelBtnSprite = "CRB_Basekit:kitBtn_List_Holo"
+local bottomLevelBtnSprite = "BK3:btnHolo_ListView_Simple"
 
 local middleLevelBtnAnchorOffsets = { -3, -2,  5, 24 }
 local bottomLevelBtnAnchorOffsets = { 22,  0, -3, 21 }
 
--- local middleLevelBtnAnchorOffsets = {  0,  0,  0, 23 }
--- local bottomLevelBtnAnchorOffsets = {  0,  0,  0, 21 }
+local middleLevelBtnAnchorOffsets = {  0,  0,  0, 22 }
+local bottomLevelBtnAnchorOffsets = { 22,  0,  0, 21 }
 
 local ktOptionTypes = {
 --@debug@
