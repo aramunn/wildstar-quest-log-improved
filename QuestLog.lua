@@ -38,72 +38,11 @@ local bottomLevelBtnSprite   = "BK3:btnMetal_ExpandMenu_MedClean"
 local quickTrackBtnBtnSprite = "BK3:btnMetal_Check_small"
 local leftSideBtnsSprite     = "CRB_UIKitSprites:btn_listBG"
 
-local topLevelBtnSprite      = "BK3:btnHolo_ListView_Top"
-local middleLevelBtnSprite   = "CRB_Basekit:kitBtn_List_Holo"
-local bottomLevelBtnSprite   = "BK3:btnHolo_ListView_Simple"
-local quickTrackBtnBtnSprite = "BK3:btnHolo_Check_small"
-local leftSideBtnsSprite     = "CRB_PlayerPathSprites:btnPP_HologramBase"
-
 local middleLevelBtnAnchorOffsets = { -3, -2,  5, 24 }
 local bottomLevelBtnAnchorOffsets = { 22,  0, -3, 21 }
 
-local middleLevelBtnAnchorOffsets = { -1,  0,  1, 22 }
-local bottomLevelBtnAnchorOffsets = { 21, -1,  4, 23 }
-
 local topLevelItemsCorrection    = {  0,  4,  1 }
 local middleLevelItemsCorrection = {  1, -2 }
-
-local topLevelItemsCorrection    = {  0,  4, -1 }
-local middleLevelItemsCorrection = {  1,  1 }
-
-local ktOptionTypes = {
---@debug@
-	buttonSprite     = -1,
-	optionsSprite    = -2,
-	backgroundSprite = -3,
---@end-debug@
-}
-
-local ktOptions =
-{
-	{ optionType = 0, optionText = "CRB_Basekit:kitBtn_Metal_Options" },
-	
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "BK3:btnHolo_ListView_Top" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "BK3:btnHolo_ListView_Simple" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "BK3:btnHolo_ListView_Mid" },
-	
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_CharacterCreateSprites:btnCharS_ListEntryNorm" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_DatachronSprites:btnDCM_DataMenu" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_DatachronSprites:btnDCPP_ExPlace" },
-
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_Metal" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_Metal_LargeBlue" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_Metal_LargeBlueStretch" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_Metal_MediumBlue" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_Metal_MediumBlueStretch" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_PlayerPathSprites:btnPP_SciListEntry" },
-
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_PlayerPathSprites:btnPP_HologramBase" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "BK3:btnHolo_ListView_Top" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_List_Holo" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "BK3:btnHolo_Btn_Mega" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_Holo" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_Holo_Large" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_HousingSprites:btnPropertyMarker" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_PlayerPathSprites:btnPP_BaseBlue" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_QuestTrackerSprites:btnQT_ScrollScroller" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Raid:btnRaid_ThinHoloBlueBtn" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "QuestLogSprites:btnQuestBlue" },
-
-	{ optionType = ktOptionTypes.optionsSprite, optionText = "CRB_Basekit:kitBtn_Metal_Options" },
-	{ optionType = ktOptionTypes.optionsSprite, optionText = "CRB_DatachronSprites:btnDCPP_SciConfig" },
-	{ optionType = ktOptionTypes.optionsSprite, optionText = "CRB_GroupFrame:sprGroup_Btn_Options" },
-	{ optionType = ktOptionTypes.optionsSprite, optionText = "CRB_MinimapSprites:btnMM_ToggleMenu" },
-	{ optionType = ktOptionTypes.optionsSprite, optionText = "QuestLogSprites:btnQuestOptions" },
-
-	{ optionType = ktOptionTypes.backgroundSprite, optionText = "BK3:UI_BK3_Metal_Inset_Block3" },
-	{ optionType = ktOptionTypes.backgroundSprite, optionText = "CRB_UIKitSprites:spr_baseframeTHIN_Hologram" },
-}
 
 local ktChatNotificationStrings =
 {
@@ -1452,37 +1391,6 @@ function QuestLog:OnCollapseAllQuestsBtn(wndHandler, wndControl)
   self:RedrawLeftTree()
   self.wndLeftSideScroll:SetVScrollPos(0)
   self:ResizeTree()
-end
-
-function QuestLog:OnOptionsButton(wndHandler, wndControl)
-	local option = wndHandler:GetData()
-	Print("Option: "..option.optionText.." ("..option.optionType..")")
-	local t = option.optionType
-	if t == ktOptionTypes.buttonSprite then
-		-- topLevelBtnSprite = option.optionText
-		-- middleLevelBtnSprite = option.optionText
-		-- bottomLevelBtnSprite = option.optionText
-		self.wndLeftFilterActive:ChangeArt(option.optionText)
-		self.wndLeftFilterFinished:ChangeArt(option.optionText)
-		self.wndLeftFilterHidden:ChangeArt(option.optionText)
-		self.wndLeftExpandAll:ChangeArt(option.optionText)
-		self.wndLeftCollapseAll:ChangeArt(option.optionText)
-		-- self.wndLeftSideScroll
-		-- self:RedrawLeftTree()
-	elseif t == ktOptionTypes.optionsSprite    then self.wndMain:FindChild("OptionsPopoutBtn"):ChangeArt(option.optionText)
-	elseif t == ktOptionTypes.backgroundSprite then self.wndMain:FindChild("LeftSideFilterBtnsBG"):SetSprite(option.optionText)
-	elseif t == 0 then self:SwitchTheme()
-	else Print("QuestLogImproved: unknown option type "..t) end
-end
-
-local theme = true
-function QuestLog:SwitchTheme()
-	theme = not theme
-	if theme then
-		Print("theme 1")
-	else
-		Print("theme 2")
-	end
 end
 
 local QuestLogInst = QuestLog:new()
