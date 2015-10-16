@@ -131,8 +131,6 @@ function QuestLog:Initialize()
 	self.wndLeftSideScroll = self.wndMain:FindChild("LeftSideScroll")
 	self.wndRightSide = self.wndMain:FindChild("RightSide")
 	self.wndQuestInfoControls = self.wndMain:FindChild("QuestInfoControls")
-	self.wndBGOptions = self.wndMain:FindChild("OptionsBGWindow")
-	self.wndOptions = self.wndMain:FindChild("OptionsWindow")
 
 	-- Variables
 	self.wndLastBottomLevelBtnSelection = nil -- Just for button pressed state faking of text color
@@ -143,7 +141,6 @@ function QuestLog:Initialize()
 	self.wndLeftFilterActive:SetCheck(true)
 	self.wndMain:FindChild("QuestAbandonPopoutBtn"):AttachWindow(self.wndMain:FindChild("QuestAbandonConfirm"))
 	self.wndMain:FindChild("EpisodeSummaryExpandBtn"):AttachWindow(self.wndMain:FindChild("EpisodeSummaryPopoutTextBG"))
-	self.wndMain:FindChild("OptionsPopoutBtn"):AttachWindow(self.wndMain:FindChild("OptionsBGWindow"))
 
 	-- Measure Windows
 	local wndMeasure = Apollo.LoadForm(self.xmlDoc, "TopLevelItem", nil, self)
@@ -158,10 +155,6 @@ function QuestLog:Initialize()
 	self.knBottomLevelHeight = wndMeasure:GetHeight()
 	wndMeasure:Destroy()
 
-	wndMeasure = Apollo.LoadForm(self.xmlDoc, "OptionsItem", nil, self)
-	self.knOptionsHeight = wndMeasure:GetHeight()
-	wndMeasure:Destroy()
-
 	wndMeasure = Apollo.LoadForm(self.xmlDoc, "ObjectivesItem", nil, self)
 	self.knObjectivesItemHeight = wndMeasure:GetHeight()
 	wndMeasure:Destroy()
@@ -172,23 +165,6 @@ function QuestLog:Initialize()
 	self.nEpisodeInfoHeight = self.wndMain:FindChild("EpisodeInfo"):GetHeight()
 
 	self:DestroyAndRedraw()
-
-	local maxOptionsHeight = 500
-	local optionsHeight = 10
-	for idx, option in pairs(ktOptions) do
-		local wndOption = Apollo.LoadForm(self.xmlDoc, "OptionsItem", self.wndOptions, self)
-		local wndOptionButton = wndOption:FindChild("OptionsButton")
-		wndOptionButton:SetText(option.optionText)
-		wndOptionButton:SetData(option)
-		wndOptionButton:ChangeArt(option.optionText)
-    optionsHeight = optionsHeight + self.knOptionsHeight
-	end
-	if optionsHeight > maxOptionsHeight then
-		optionsHeight = maxOptionsHeight
-	end
-	local nOptionsLeft, nOptionsTop, nOptionsRight, nOptionsBottom = self.wndBGOptions:GetAnchorOffsets()
-	self.wndBGOptions:SetAnchorOffsets(nOptionsLeft, nOptionsBottom - optionsHeight, nOptionsRight, nOptionsBottom)
-	self.wndOptions:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.Middle)
 end
 
 function QuestLog:OnGenericEvent_ShowQuestLog(queTarget)
