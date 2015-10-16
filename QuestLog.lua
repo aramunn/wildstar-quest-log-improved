@@ -46,25 +46,9 @@ local ktOptionTypes = {
 
 local ktOptions =
 {
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_List_MetalBorder" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_ListHeader_Top" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_ListHeader_Middle" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_UIKitSprites:btn_listBG" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "OldMetalSprites:OldMetalGridHeader" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "OldMetalSprites:OldMetalGrid" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "BK3:btnMetal_ExpandMenu_LargeClean" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "BK3:btnMetal_ExpandMenu_MedClean" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "BK3:btnMetal_ExpandMenu_NoNav" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_List_MetalNoEdge" },
-	
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_List_RightArrowHighlight" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_Metal_IconBase" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_Metal_IconBaseStretch" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_CharacterCreateSprites:btnCharS_ListEntryNorm" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_DatachronSprites:btnDCM_DataMenu" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_DatachronSprites:btnDCPP_ExPlace" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_PlayerPathSprites:btnPP_BaseGrey" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_UIKitSprites:btn_listBGTALL" },
 
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_Metal" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_Metal_LargeBlue" },
@@ -72,22 +56,17 @@ local ktOptions =
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_Metal_MediumBlue" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_Metal_MediumBlueStretch" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_PlayerPathSprites:btnPP_SciListEntry" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Tradeskills:btnSchemCraft" },
 
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_PlayerPathSprites:btnPP_HologramBase" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "BK3:btnHolo_ListView_Top" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_List_Holo" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "BK3:btnHolo_Btn_Mega" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "Contracts:btnContracts_CheckBox" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_Holo" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Basekit:kitBtn_Holo_Large" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_HousingSprites:btnHologramRedfill" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_HousingSprites:btnPropertyMarker" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_PlayerPathSprites:btnPP_BaseBlue" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_QuestTrackerSprites:btnQT_ScrollScroller" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_Raid:btnRaid_ThinHoloBlueBtn" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "CRB_TechTree:CRB_TechTree_BlueBtn" },
-	{ optionType = ktOptionTypes.buttonSprite, optionText = "HUD_BottomBar:btn_HUD_MenuIconBtn" },
 	{ optionType = ktOptionTypes.buttonSprite, optionText = "QuestLogSprites:btnQuestBlue" },
 
 	{ optionType = ktOptionTypes.optionsSprite, optionText = "CRB_Basekit:kitBtn_Metal_Options" },
