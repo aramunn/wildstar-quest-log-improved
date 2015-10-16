@@ -45,14 +45,14 @@ local quickTrackBtnBtnSprite = "BK3:btnHolo_Check_small"
 local middleLevelBtnAnchorOffsets = { -3, -2,  5, 24 }
 local bottomLevelBtnAnchorOffsets = { 22,  0, -3, 21 }
 
-local middleLevelBtnAnchorOffsets = {  0,  0,  0, 22 }
-local bottomLevelBtnAnchorOffsets = { 22,  0,  0, 21 }
+local middleLevelBtnAnchorOffsets = { -1,  0,  1, 22 }
+local bottomLevelBtnAnchorOffsets = { 21, -1,  4, 23 }
 
 local topLevelItemsCorrection    = {  0,  4,  1 }
 local middleLevelItemsCorrection = {  1, -2 }
 
-local topLevelItemsCorrection    = {  0,  4,  1 }
-local middleLevelItemsCorrection = {  1, -2 }
+local topLevelItemsCorrection    = {  0,  4, -1 }
+local middleLevelItemsCorrection = {  1,  1 }
 
 local ktOptionTypes = {
 --@debug@
