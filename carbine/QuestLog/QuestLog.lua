@@ -706,9 +706,12 @@ function QuestLog:DrawRightSide(queSelected)
 	elseif string.len(queSelected:GetSummary()) > 0 then
 		strQuestSummary = queSelected:GetSummary()
 	end
-
-	local tConData = ktConToUI[queSelected:GetColoredDifficulty() or 1]
-	local strDifficulty = String_GetWeaselString(Apollo.GetString("QuestLog_Difficulty"), "<T Font=\"CRB_InterfaceMedium\" TextColor=\""..tConData[2].."\"> "..tConData[3].."</T>")
+	
+	local nDifficultyLevel = queSelected:GetColoredDifficulty() or 1
+	local tConData = ktConToUI[nDifficultyLevel]
+	local strDifficulty = String_GetWeaselString(Apollo.GetString("QuestLog_Difficulty"), 
+		"<T Font=\"CRB_InterfaceMedium\" TextColor=\""..tConData[2].."\"> "
+		..String_GetWeaselString(Apollo.GetString("QuestLog_DifficultyTextAndNumber"), tConData[3], nDifficultyLevel).."</T>")
 	wndRight:FindChild("QuestInfoDifficultyPic"):SetSprite(tConData[1])
 	wndRight:FindChild("QuestInfoDifficultyPic"):SetTooltip(String_GetWeaselString(Apollo.GetString("QuestLog_IntendedLevel"), queSelected:GetTitle(), queSelected:GetConLevel()))
 	wndRight:FindChild("QuestInfoDifficultyText"):SetAML("<P Font=\"CRB_InterfaceMedium_BB\" TextColor=\"UI_TextHoloBodyHighlight\">"..strDifficulty.."</P>")
