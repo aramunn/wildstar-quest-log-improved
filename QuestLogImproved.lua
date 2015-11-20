@@ -143,7 +143,11 @@ function QuestLog:Initialize()
 	self.wndMain:FindChild("EpisodeSummaryExpandBtn"):AttachWindow(self.wndMain:FindChild("EpisodeSummaryPopoutTextBG"))
 
 	-- Measure Windows
-	local wndMeasure = Apollo.LoadForm(self.xmlDoc, "TopLevelItem", nil, self)
+	local wndMeasure = Apollo.LoadForm(self.xmlDoc, "OptionItem", nil, self)
+	self.knOptionHeight = wndMeasure:GetHeight()
+	wndMeasure:Destroy()
+
+	wndMeasure = Apollo.LoadForm(self.xmlDoc, "TopLevelItem", nil, self)
 	self.knTopLevelHeight = wndMeasure:GetHeight()
 	wndMeasure:Destroy()
 
