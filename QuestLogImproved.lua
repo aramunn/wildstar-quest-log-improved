@@ -86,7 +86,7 @@ local karEvalColors =
 }
 
 function QuestLog:OnLoad()
-	self.xmlDoc = XmlDoc.CreateFromFile("QuestLog.xml")-- QuestLog will always be kept in memory, so save parsing it over and over
+	self.xmlDoc = XmlDoc.CreateFromFile("QuestLogImproved.xml")-- QuestLog will always be kept in memory, so save parsing it over and over
 	self.xmlDoc:RegisterCallback("OnDocumentReady", self)
 
 	Apollo.RegisterEventHandler("InterfaceMenuListHasLoaded", "OnInterfaceMenuListHasLoaded", self)
