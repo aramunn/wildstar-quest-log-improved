@@ -32,9 +32,6 @@ end
 
 local knEpisodeInfoBuffer = 10
 
-local topLevelItemsCorrection    = {  0,  4,  1 }
-local middleLevelItemsCorrection = {  1, -2 }
-
 local ktChatNotificationStrings =
 {
 	[Quest.QuestState_Accepted] 	= Apollo.GetString("QuestLog_QuestAccepted"),
@@ -586,10 +583,10 @@ function QuestLog:ResizeTree()
 				local nMiddleItemsHeight = wndMiddleLevelItems:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop)
 				if nMiddleItemsHeight > 0 then
 					lastChildHasItems = true
-					nMiddleItemsHeight = nMiddleItemsHeight + middleLevelItemsCorrection[1]
+					nMiddleItemsHeight = nMiddleItemsHeight + 1
 				else
 					lastChildHasItems = false
-					nMiddleItemsHeight = nMiddleItemsHeight + middleLevelItemsCorrection[2]
+					nMiddleItemsHeight = nMiddleItemsHeight - 2
 				end
 
 				local nMiddleLeft, nMiddleTop, nMiddleRight, nMiddleBottom = wndMiddle:GetAnchorOffsets()
@@ -602,12 +599,12 @@ function QuestLog:ResizeTree()
 		local nTopItemsHeight = wndTopLevelItems:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop, function(a,b) return a:GetData() > b:GetData() end) -- Tasks to bottom
 		if nTopItemsHeight > 0 then
 			if lastChildHasItems then
-				nTopItemsHeight = nTopItemsHeight + topLevelItemsCorrection[1]
+				nTopItemsHeight = nTopItemsHeight
 			else
-				nTopItemsHeight = nTopItemsHeight + topLevelItemsCorrection[2]
+				nTopItemsHeight = nTopItemsHeight + 4
 			end
 		else
-			nTopItemsHeight = nTopItemsHeight + topLevelItemsCorrection[3]
+			nTopItemsHeight = nTopItemsHeight + 1
 		end
 		local nTopLeft, nTopTop, nTopRight, nTopBottom = wndTop:GetAnchorOffsets()
 		wndTop:SetAnchorOffsets(nTopLeft, nTopTop, nTopRight, nTopTop + self.knTopLevelHeight + nTopItemsHeight)
