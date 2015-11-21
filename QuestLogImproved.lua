@@ -32,12 +32,6 @@ end
 
 local knEpisodeInfoBuffer = 10
 
-local topLevelBtnSprite      = "BK3:btnMetal_ExpandMenu_LargeClean"
-local middleLevelBtnSprite   = "CRB_Basekit:kitBtn_ListHeader_Middle"
-local bottomLevelBtnSprite   = "BK3:btnMetal_ExpandMenu_MedClean"
-local quickTrackBtnBtnSprite = "BK3:btnMetal_Check_small"
-local leftSideBtnsSprite     = "CRB_UIKitSprites:btn_listBG"
-
 local middleLevelBtnAnchorOffsets = { -3, -2,  5, 24 }
 local bottomLevelBtnAnchorOffsets = { 22,  0, -3, 21 }
 
@@ -475,7 +469,6 @@ function QuestLog:RedrawLeftTree()
 				for idx2, epiEpisode in pairs(arEpisodes[strCategoryKey]) do
 					local strEpisodeKey = strCategoryKey.."E"..epiEpisode:GetId()
 					local wndMiddle = self:FactoryCacheProduce(wndTopLevelItems, "MiddleLevelItem", strEpisodeKey)
-					wndMiddle:FindChild("MiddleLevelBtn"):ChangeArt(middleLevelBtnSprite)
 					self:HelperSetupMiddleLevelWindow(wndMiddle, epiEpisode)
 
 					if epiEpisode:IsZoneStory() then
@@ -489,7 +482,6 @@ function QuestLog:RedrawLeftTree()
 			if bHasTasks[strCategoryKey] then
 				local strEpisodeKey = strCategoryKey.."ETasks"
 				local wndMiddle = self:FactoryCacheProduce(wndTopLevelItems, "MiddleLevelItem", strEpisodeKey)
-				wndMiddle:FindChild("MiddleLevelBtn"):ChangeArt(middleLevelBtnSprite)
 				self:HelperSetupFakeMiddleLevelWindow(wndMiddle, Apollo.GetString("QuestLog_Tasks"))
 				wndMiddle:SetData("")
 
@@ -501,18 +493,14 @@ function QuestLog:RedrawLeftTree()
 	if bWorldStoryHasData then
 		local strCategoryKey = "CWorldStory"
 		local wndTop = self:FactoryCacheProduce(self.wndLeftSideScroll, "TopLevelItem", strCategoryKey)
-		local wndTopBtn = wndTop:FindChild("TopLevelBtn")
-		wndTopBtn:ChangeArt(topLevelBtnSprite)
-		wndTopBtn:SetText(Apollo.GetString("QuestLog_WorldStory"))
+		wndTop:FindChild("TopLevelBtn"):SetText(Apollo.GetString("QuestLog_WorldStory"))
 		fnBuildCategoryEpisodes(strCategoryKey, wndTop)
 	end
 
 	for idx1, qcCategory in pairs(arCategories) do
 		local strCategoryKey = "C"..qcCategory:GetId()
 		local wndTop = self:FactoryCacheProduce(self.wndLeftSideScroll, "TopLevelItem", strCategoryKey)
-		local wndTopBtn = wndTop:FindChild("TopLevelBtn")
-		wndTopBtn:ChangeArt(topLevelBtnSprite)
-		wndTopBtn:SetText(qcCategory:GetTitle())
+		wndTop:FindChild("TopLevelBtn"):SetText(qcCategory:GetTitle())
 		fnBuildCategoryEpisodes(strCategoryKey, wndTop)
 	end
 end
@@ -548,7 +536,6 @@ function QuestLog:HelperSetupBottomLevelWindow(wndBot, queQuest)
 	wndBottomLevelBtn:SetAnchorOffsets(a[1], a[2], a[3], a[4])
 
 	local bOptionalQuest = queQuest:IsOptionalForEpisode(queQuest:GetEpisode():GetId())
-	wndBottomLevelBtn:ChangeArt(bottomLevelBtnSprite)
 	questText = bOptionalQuest and String_GetWeaselString(Apollo.GetString("QuestLog_OptionalAppend"), queQuest:GetTitle()) or queQuest:GetTitle()
 	questText = " ["..queQuest:GetConLevel().."] "..questText
 	wndBottomLevelBtn:SetText(questText)
@@ -571,7 +558,6 @@ function QuestLog:HelperSetupBottomLevelWindow(wndBot, queQuest)
 	local wndQuickTrackBtn = wndBot:FindChild("QuickTrackBtn")
 	local wndBottomItemTree = wndBot:FindChild("Tree")
 	local bIsTracked = queQuest:IsTracked()
-	wndQuickTrackBtn:ChangeArt(quickTrackBtnBtnSprite)
 	wndQuickTrackBtn:SetCheck(bIsTracked)
 	wndQuickTrackBtn:Enable(eState ~= Quest.QuestState_Botched)
 	-- Only show if quest is active
