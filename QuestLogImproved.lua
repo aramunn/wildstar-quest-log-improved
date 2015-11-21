@@ -120,7 +120,9 @@ function QuestLog:Initialize()
   self.wndLeftSideScroll = self.wndMain:FindChild("LeftSideScroll")
   self.wndLeftSideScrollActions = self.wndMain:FindChild("LeftSideScrollActions")
   self.wndRightSide = self.wndMain:FindChild("RightSide")
+  self.wndRightSideAction = self.wndMain:FindChild("RightSideAction")
   self.wndQuestInfoControls = self.wndMain:FindChild("QuestInfoControls")
+  self.wndActionControls = self.wndMain:FindChild("ActionControls")
 
   -- Variables
   self.wndLastBottomLevelBtnSelection = nil -- Just for button pressed state faking of text color
@@ -167,6 +169,8 @@ function QuestLog:OnGenericEvent_ShowQuestLog(queTarget)
   self.wndLeftFilterFinished:SetCheck(false)
   self.wndLeftFilterActions:SetCheck(false)
   self.wndLeftSideScroll:DestroyChildren()
+  self.wndLeftSideScrollActions:DestroyChildren()
+  self.LoadedActions = false
 
   local qcTop = queTarget:GetCategory()
   local epiMid = queTarget:GetEpisode()
@@ -231,7 +235,10 @@ end
 function QuestLog:DestroyAndRedraw() -- TODO, remove as much as possible that calls this
   if self.wndMain and self.wndMain:IsValid() then
     self.wndLeftSideScroll:DestroyChildren()
+    self.wndLeftSideScrollActions:DestroyChildren()
+    self.LoadedActions = false
     self.wndLeftSideScroll:SetVScrollPos(0)
+    self.wndLeftSideScrollActions:SetVScrollPos(0)
   end
 
   self.arLeftTreeMap = {}
@@ -497,14 +504,21 @@ function QuestLog:RedrawLeftTree()
     fnBuildCategoryEpisodes(strCategoryKey, wndTop)
   end
   
+  self.wndRightSideAction:Show(false)
   if self.wndLeftFilterActions:IsChecked() then
-    local wnd = Apollo.LoadForm(self.xmlDoc, "ActionItem", self.wndLeftSideScrollActions, self)
-    self.wndLeftSideScroll:Show(false)
-    self.wndLeftSideScrollActions:Show(true)
-  else
-    self.wndLeftSideScroll:Show(true)
-    self.wndLeftSideScrollActions:Show(false)
+    if not self.LoadedActions then
+      local wnd = Apollo.LoadForm(self.xmlDoc, "ActionItem", self.wndLeftSideScrollActions, self)
+      Apollo.LoadForm(self.xmlDoc, "ActionItem", self.wndLeftSideScrollActions, self)
+      self.wndLeftSideScrollActions:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop)
+      self.LoadedActions = true
+    end
   end
+  self.wndLeftSideScroll:Show(not self.LoadedActions)
+  self.wndRightSide:Show(not self.LoadedActions)
+  self.wndQuestInfoControls:Show(not self.LoadedActions)
+  self.wndLeftSideScrollActions:Show(self.LoadedActions)
+  self.wndRightSideAction:Show(self.LoadedActions)
+  self.wndActionControls:Show(self.LoadedActions)
 end
 
 function QuestLog:HelperSetupMiddleLevelWindow(wndMiddle, epiEpisode)
@@ -1350,6 +1364,14 @@ function QuestLog:OnCollapseAllQuestsBtn(wndHandler, wndControl)
   self:RedrawLeftTree()
   self.wndLeftSideScroll:SetVScrollPos(0)
   self:ResizeTree()
+end
+
+function QuestLog:OnActionItemBtnCheck(wndHandler, wndControl)
+  Print("in btn check")
+end
+
+function QuestLog:OnActionItemBtnUncheck(wndHandler, wndControl)
+  Print("in btn unck")
 end
 
 local QuestLogInst = QuestLog:new()
