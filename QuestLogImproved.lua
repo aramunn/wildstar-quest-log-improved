@@ -117,7 +117,6 @@ function QuestLog:Initialize()
 	self.wndLeftExpandAll = self.wndMain:FindChild("LeftSideFilterBtnsBG:LeftSideBtnExpandAll")
 	self.wndLeftCollapseAll = self.wndMain:FindChild("LeftSideFilterBtnsBG:LeftSideBtnCollapseAll")
 	self.wndLeftSideScroll = self.wndMain:FindChild("LeftSideScroll")
-	self.wndLeftSideScrollActions = self.wndMain:FindChild("LeftSideScrollActions")
 	self.wndRightSide = self.wndMain:FindChild("RightSide")
 	self.wndQuestInfoControls = self.wndMain:FindChild("QuestInfoControls")
 
