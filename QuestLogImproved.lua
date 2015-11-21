@@ -114,9 +114,11 @@ function QuestLog:Initialize()
   self.wndLeftFilterActive = self.wndMain:FindChild("LeftSideFilterBtnsBG:LeftSideFilterBtnShowActive")
   self.wndLeftFilterFinished = self.wndMain:FindChild("LeftSideFilterBtnsBG:LeftSideFilterBtnShowFinished")
   self.wndLeftFilterHidden = self.wndMain:FindChild("LeftSideFilterBtnsBG:LeftSideFilterBtnShowHidden")
+  self.wndLeftFilterActions = self.wndMain:FindChild("LeftSideFilterBtnsBG:LeftSideFilterBtnShowActions")
   self.wndLeftExpandAll = self.wndMain:FindChild("LeftSideFilterBtnsBG:LeftSideBtnExpandAll")
   self.wndLeftCollapseAll = self.wndMain:FindChild("LeftSideFilterBtnsBG:LeftSideBtnCollapseAll")
   self.wndLeftSideScroll = self.wndMain:FindChild("LeftSideScroll")
+  self.wndLeftSideScrollActions = self.wndMain:FindChild("LeftSideScrollActions")
   self.wndRightSide = self.wndMain:FindChild("RightSide")
   self.wndQuestInfoControls = self.wndMain:FindChild("QuestInfoControls")
 
@@ -163,6 +165,7 @@ function QuestLog:OnGenericEvent_ShowQuestLog(queTarget)
   self.wndLeftFilterActive:SetCheck(true)
   self.wndLeftFilterHidden:SetCheck(false)
   self.wndLeftFilterFinished:SetCheck(false)
+  self.wndLeftFilterActions:SetCheck(false)
   self.wndLeftSideScroll:DestroyChildren()
 
   local qcTop = queTarget:GetCategory()
@@ -492,6 +495,15 @@ function QuestLog:RedrawLeftTree()
     local wndTop = self:FactoryCacheProduce(self.wndLeftSideScroll, "TopLevelItem", strCategoryKey)
     wndTop:FindChild("TopLevelBtn"):SetText(qcCategory:GetTitle())
     fnBuildCategoryEpisodes(strCategoryKey, wndTop)
+  end
+  
+  if self.wndLeftFilterActions:IsChecked() then
+    local wnd = Apollo.LoadForm(self.xmlDoc, "ActionItem", self.wndLeftSideScrollActions, self)
+    self.wndLeftSideScroll:Show(false)
+    self.wndLeftSideScrollActions:Show(true)
+  else
+    self.wndLeftSideScroll:Show(true)
+    self.wndLeftSideScrollActions:Show(false)
   end
 end
 
