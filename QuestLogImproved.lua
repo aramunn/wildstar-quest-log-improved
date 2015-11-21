@@ -32,9 +32,6 @@ end
 
 local knEpisodeInfoBuffer = 10
 
-local middleLevelBtnAnchorOffsets = { -3, -2,  5, 24 }
-local bottomLevelBtnAnchorOffsets = { 22,  0, -3, 21 }
-
 local topLevelItemsCorrection    = {  0,  4,  1 }
 local middleLevelItemsCorrection = {  1, -2 }
 
@@ -507,10 +504,7 @@ end
 
 function QuestLog:HelperSetupMiddleLevelWindow(wndMiddle, epiEpisode)
 	local tEpisodeProgress = epiEpisode:GetProgress()
-	local wndMiddleLevelBtn = wndMiddle:FindChild("MiddleLevelBtn")
-	local a = middleLevelBtnAnchorOffsets
-	wndMiddleLevelBtn:SetAnchorOffsets(a[1], a[2], a[3], a[4])
-	wndMiddleLevelBtn:SetText("        "..epiEpisode:GetTitle())
+	wndMiddle:FindChild("MiddleLevelBtn"):SetText("        "..epiEpisode:GetTitle())
 	wndMiddle:FindChild("MiddleLevelProgBar"):SetMax(tEpisodeProgress.nTotal)
 	wndMiddle:FindChild("MiddleLevelProgBar"):SetProgress(tEpisodeProgress.nCompleted)
 	wndMiddle:FindChild("MiddleLevelIcon"):SetTooltip(self.wndLeftFilterFinished:IsChecked() and "" or Apollo.GetString("QuestLog_MoreQuestsToComplete"))
@@ -519,10 +513,7 @@ end
 
 function QuestLog:HelperSetupFakeMiddleLevelWindow(wndMiddle, strText)
 	local tEpisodeProgress = { nTotal = 100, nCompleted = 0 }
-	local wndMiddleLevelBtn = wndMiddle:FindChild("MiddleLevelBtn")
-	local a = middleLevelBtnAnchorOffsets
-	wndMiddleLevelBtn:SetAnchorOffsets(a[1], a[2], a[3], a[4])
-	wndMiddleLevelBtn:SetText("        "..strText)
+	wndMiddle:FindChild("MiddleLevelBtn"):SetText("        "..strText)
 	wndMiddle:FindChild("MiddleLevelProgBar"):SetMax(tEpisodeProgress.nTotal)
 	wndMiddle:FindChild("MiddleLevelProgBar"):SetProgress(tEpisodeProgress.nCompleted)
 	wndMiddle:FindChild("MiddleLevelIcon"):SetTooltip(self.wndLeftFilterFinished:IsChecked() and "" or Apollo.GetString("QuestLog_MoreQuestsToComplete"))
@@ -531,9 +522,6 @@ end
 
 function QuestLog:HelperSetupBottomLevelWindow(wndBot, queQuest)
 	local wndBottomLevelBtn = wndBot:FindChild("BottomLevelBtn")
-	
-	local a = bottomLevelBtnAnchorOffsets
-	wndBottomLevelBtn:SetAnchorOffsets(a[1], a[2], a[3], a[4])
 
 	local bOptionalQuest = queQuest:IsOptionalForEpisode(queQuest:GetEpisode():GetId())
 	questText = bOptionalQuest and String_GetWeaselString(Apollo.GetString("QuestLog_OptionalAppend"), queQuest:GetTitle()) or queQuest:GetTitle()
