@@ -1404,7 +1404,11 @@ end
 
 function QuestLog:HandleContextMenuButton(strButtonName, wnd, nLevel)
   if nLevel == 1 then
-    Print(strButtonName.." "..tostring(wnd:GetData():GetTitle()))
+    local quest = wnd:GetData()
+    Print(strButtonName.." "..tostring(quest:GetTitle()))
+    if strButtonName == "BtnAbandon" then Print("Will abandon") end
+    if strButtonName == "BtnTrack" then Print("Will track"); quest:SetTracked(true) end
+    if strButtonName == "BtnUntrack" then Print("Will untrack"); quest:SetTracked(false) end
   else
     local tWindowNames
     if nLevel == 2 then tWindowNames = { items = "MiddleLevelItems", button = "BottomLevelBtn" } end
@@ -1420,9 +1424,10 @@ end
 function QuestLog:OnRegularBtn(wndHandler, wndControl)
   local tData = self.wndContextMenu:GetData()
   local strButtonName = wndHandler:GetName()
-  self:HandleContextMenuButton(strButtonName, tData.window, tData.level)
   self.wndContextMenu:Close()
   self.wndContextMenu = nil
+  self:HandleContextMenuButton(strButtonName, tData.window, tData.level)
+  self:RedrawLeftTree()
 end
 
 local QuestLogInst = QuestLog:new()
