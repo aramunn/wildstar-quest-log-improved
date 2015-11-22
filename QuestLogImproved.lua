@@ -1378,5 +1378,32 @@ function QuestLog:OnActionItemBtnUncheck(wndHandler, wndControl)
   self.wndActionControls:Show(false)
 end
 
+function QuestLog:OnBottomLevelBtnMouseUp(wndHandler, wndControl, eMouseButton)
+  if self.wndContextMenu and self.wndContextMenu:IsValid() then
+    self.wndContextMenu:Destroy()
+    self.wndContextMenu = nil
+  end
+  if eMouseButton == GameLib.CodeEnumInputMouse.Right then
+    self.wndContextMenu = Apollo.LoadForm(self.xmlDoc, "ContextMenuQuestLogForm", "TooltipStratum", self)
+    self.wndContextMenu:SetData({ level = 1, wnd = wndHandler })
+    self.wndContextMenu:Invoke()
+    local tCursor = Apollo.GetMouse()
+    self.wndContextMenu:Move(tCursor.x - 10, tCursor.y - 25, self.wndContextMenu:GetWidth(), self.wndContextMenu:GetHeight())
+  end
+end
+
+function QuestLog:OnRegularBtn(wndHandler, wndControl)
+  local data = self.wndContextMenu:GetData()
+  local strButtonName = wndHandler:GetName()
+  Print(strButtonName.." "..tostring(data.level).." "..tostring(data.wnd:GetData():GetTitle()))
+  -- if strButtonName == "BtnSplitStack" then
+    -- Event_FireGenericEvent("GenericEvent_SplitItemStack", itemArg)
+  -- elseif strButtonName == "BtnLinkToChat" then
+    -- Event_FireGenericEvent("GenericEvent_LinkItemToChat", itemArg)
+  -- end
+  self.wndContextMenu:Close()
+  self.wndContextMenu = nil
+end
+
 local QuestLogInst = QuestLog:new()
 QuestLogInst:Init()
