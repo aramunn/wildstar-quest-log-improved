@@ -514,8 +514,8 @@ function QuestLog:RedrawLeftTree()
     end
   end
   self.wndLeftSideScroll:Show(not self.LoadedActions)
-  self.wndRightSide:Show(not self.LoadedActions)
-  self.wndQuestInfoControls:Show(not self.LoadedActions)
+  self.wndRightSide:Show(not self.LoadedActions and self.wndRightSide:GetData())
+  self.wndQuestInfoControls:Show(not self.LoadedActions and self.wndRightSide:GetData())
   self.wndLeftSideScrollActions:Show(self.LoadedActions)
   self.wndRightSideAction:Show(false)
   self.wndActionControls:Show(false)
