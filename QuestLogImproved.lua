@@ -508,7 +508,7 @@ function QuestLog:RedrawLeftTree()
   if self.wndLeftFilterActions:IsChecked() then
     if not self.LoadedActions then
       local wnd = Apollo.LoadForm(self.xmlDoc, "ActionItem", self.wndLeftSideScrollActions, self)
-      Apollo.LoadForm(self.xmlDoc, "ActionItem", self.wndLeftSideScrollActions, self)
+      wnd:FindChild("Button"):SetText("Abandon All Below Level")
       self.wndLeftSideScrollActions:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop)
       self.LoadedActions = true
     end
@@ -517,8 +517,8 @@ function QuestLog:RedrawLeftTree()
   self.wndRightSide:Show(not self.LoadedActions)
   self.wndQuestInfoControls:Show(not self.LoadedActions)
   self.wndLeftSideScrollActions:Show(self.LoadedActions)
-  self.wndRightSideAction:Show(self.LoadedActions)
-  self.wndActionControls:Show(self.LoadedActions)
+  self.wndRightSideAction:Show(false)
+  self.wndActionControls:Show(false)
 end
 
 function QuestLog:HelperSetupMiddleLevelWindow(wndMiddle, epiEpisode)
@@ -1368,10 +1368,14 @@ end
 
 function QuestLog:OnActionItemBtnCheck(wndHandler, wndControl)
   Print("in btn check")
+  self.wndRightSideAction:Show(true)
+  self.wndActionControls:Show(true)
 end
 
 function QuestLog:OnActionItemBtnUncheck(wndHandler, wndControl)
   Print("in btn unck")
+  self.wndRightSideAction:Show(false)
+  self.wndActionControls:Show(false)
 end
 
 local QuestLogInst = QuestLog:new()
