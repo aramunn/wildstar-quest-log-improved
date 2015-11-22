@@ -1405,15 +1405,13 @@ end
 function QuestLog:HandleContextMenuButton(strButtonName, wnd, nLevel)
   if nLevel == 1 then
     local quest = wnd:GetData()
-    Print(strButtonName.." "..tostring(quest:GetTitle()))
-    if strButtonName == "BtnAbandon" then Print("Will abandon") end
-    if strButtonName == "BtnTrack" then Print("Will track"); quest:SetTracked(true) end
-    if strButtonName == "BtnUntrack" then Print("Will untrack"); quest:SetTracked(false) end
+    if strButtonName == "BtnAbandon" then quest:Abandon() end
+    if strButtonName == "BtnTrack" then quest:SetTracked(true) end
+    if strButtonName == "BtnUntrack" then quest:SetTracked(false) end
   else
     local tWindowNames
     if nLevel == 2 then tWindowNames = { items = "MiddleLevelItems", button = "BottomLevelBtn" } end
     if nLevel == 3 then tWindowNames = { items = "TopLevelItems", button = "MiddleLevelBtn" } end
-    Print(strButtonName.." "..nLevel)
     if not tWindowNames then return end
     for idx, wndItem in pairs(wnd:GetParent():FindChild(tWindowNames.items):GetChildren()) do
       self:HandleContextMenuButton(strButtonName, wndItem:FindChild(tWindowNames.button), nLevel - 1)
