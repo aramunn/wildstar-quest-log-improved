@@ -1405,7 +1405,9 @@ end
 function QuestLog:HandleContextMenuButton(strButtonName, wnd, nLevel)
   if nLevel == 1 then
     local quest = wnd:GetData()
-    if strButtonName == "BtnAbandon" then quest:Abandon() end
+    local eState = quest:GetState()
+    if strButtonName == "BtnAbandon" and quest:CanAbandon() then quest:Abandon() end
+    if strButtonName == "BtnIgnore" and (eState == Quest.QuestState_Abandoned or eState == Quest.QuestState_Mentioned) then quest:ToggleIgnored() end
     if strButtonName == "BtnTrack" then quest:SetTracked(true) end
     if strButtonName == "BtnUntrack" then quest:SetTracked(false) end
   else
@@ -1425,7 +1427,12 @@ function QuestLog:OnRegularBtn(wndHandler, wndControl)
   self.wndContextMenu:Close()
   self.wndContextMenu = nil
   self:HandleContextMenuButton(strButtonName, tData.window, tData.level)
-  self:RedrawLeftTree()
+  if strButtonName == "BtnIgnore" then
+    self:DestroyAndRedraw()
+    Apollo.CreateTimer("RedrawQuestLogInOneSec", 1, false)
+  else
+    self:RedrawLeftTree()
+  end
 end
 
 local QuestLogInst = QuestLog:new()
