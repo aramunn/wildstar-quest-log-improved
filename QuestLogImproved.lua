@@ -544,6 +544,7 @@ function QuestLog:HelperSetupBottomLevelWindow(wndBot, queQuest)
 
   local bOptionalQuest = queQuest:IsOptionalForEpisode(queQuest:GetEpisode():GetId())
   questText = bOptionalQuest and String_GetWeaselString(Apollo.GetString("QuestLog_OptionalAppend"), queQuest:GetTitle()) or queQuest:GetTitle()
+  questText = questText:gsub("^(.*)%s+(%[[^]]*%])%s*$", "%2 %1")
   questText = " ["..queQuest:GetConLevel().."] "..questText
   wndBottomLevelBtn:SetText(questText)
   wndBottomLevelBtn:SetData(queQuest)
