@@ -1385,12 +1385,13 @@ function QuestLog:ShowContextMenu(wnd, nLevel)
     self.wndContextMenu = nil
   end
   self.wndContextMenu = Apollo.LoadForm(self.xmlDoc, "ContextMenuQuestLogForm", "TooltipStratum", self)
-  local strContext = wnd:GetText()
-  strContext = strContext:gsub("^%s*", "")
-  for idx, wndBtn in pairs(self.wndContextMenu:FindChild("ButtonList"):GetChildren()) do
-    local strName = wndBtn:GetText()
-    wndBtn:SetText(strName.." "..strContext)
-  end
+  local strContext = wnd:GetText():gsub("^%s*", "")
+  local wndButtonList = self.wndContextMenu:FindChild("ButtonList")
+  wndButtonList:DestroyAllPixies()
+  wndButtonList:AddPixie({
+    loc = { fPoints = {0,0,1,0}, nOffsets = {5,3,0,25} },
+    strText = strContext, strFont = "CRB_HeaderTiny", crText = "white",
+  })
   self.wndContextMenu:SetData({ level = nLevel, window = wnd })
   self.wndContextMenu:Invoke()
   local tCursor = Apollo.GetMouse()
