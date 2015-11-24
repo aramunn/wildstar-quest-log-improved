@@ -114,15 +114,11 @@ function QuestLog:Initialize()
   self.wndLeftFilterActive = self.wndMain:FindChild("LeftSideFilterBtnsBG:LeftSideFilterBtnShowActive")
   self.wndLeftFilterFinished = self.wndMain:FindChild("LeftSideFilterBtnsBG:LeftSideFilterBtnShowFinished")
   self.wndLeftFilterHidden = self.wndMain:FindChild("LeftSideFilterBtnsBG:LeftSideFilterBtnShowHidden")
-  self.wndLeftFilterActions = self.wndMain:FindChild("LeftSideFilterBtnsBG:LeftSideFilterBtnShowActions")
   self.wndLeftExpandAll = self.wndMain:FindChild("LeftSideFilterBtnsBG:LeftSideBtnExpandAll")
   self.wndLeftCollapseAll = self.wndMain:FindChild("LeftSideFilterBtnsBG:LeftSideBtnCollapseAll")
   self.wndLeftSideScroll = self.wndMain:FindChild("LeftSideScroll")
-  self.wndLeftSideScrollActions = self.wndMain:FindChild("LeftSideScrollActions")
   self.wndRightSide = self.wndMain:FindChild("RightSide")
-  self.wndRightSideAction = self.wndMain:FindChild("RightSideAction")
   self.wndQuestInfoControls = self.wndMain:FindChild("QuestInfoControls")
-  self.wndActionControls = self.wndMain:FindChild("ActionControls")
 
   -- Variables
   self.wndLastBottomLevelBtnSelection = nil -- Just for button pressed state faking of text color
@@ -167,10 +163,7 @@ function QuestLog:OnGenericEvent_ShowQuestLog(queTarget)
   self.wndLeftFilterActive:SetCheck(true)
   self.wndLeftFilterHidden:SetCheck(false)
   self.wndLeftFilterFinished:SetCheck(false)
-  self.wndLeftFilterActions:SetCheck(false)
   self.wndLeftSideScroll:DestroyChildren()
-  self.wndLeftSideScrollActions:DestroyChildren()
-  self.LoadedActions = false
 
   local qcTop = queTarget:GetCategory()
   local epiMid = queTarget:GetEpisode()
@@ -235,10 +228,7 @@ end
 function QuestLog:DestroyAndRedraw() -- TODO, remove as much as possible that calls this
   if self.wndMain and self.wndMain:IsValid() then
     self.wndLeftSideScroll:DestroyChildren()
-    self.wndLeftSideScrollActions:DestroyChildren()
-    self.LoadedActions = false
     self.wndLeftSideScroll:SetVScrollPos(0)
-    self.wndLeftSideScrollActions:SetVScrollPos(0)
   end
 
   self.arLeftTreeMap = {}
@@ -503,22 +493,6 @@ function QuestLog:RedrawLeftTree()
     wndTop:FindChild("TopLevelBtn"):SetText(qcCategory:GetTitle())
     fnBuildCategoryEpisodes(strCategoryKey, wndTop)
   end
-  
-  self.wndRightSideAction:Show(false)
-  if self.wndLeftFilterActions:IsChecked() then
-    if not self.LoadedActions then
-      local wnd = Apollo.LoadForm(self.xmlDoc, "ActionItem", self.wndLeftSideScrollActions, self)
-      wnd:FindChild("Button"):SetText("Abandon All Below Level")
-      self.wndLeftSideScrollActions:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop)
-      self.LoadedActions = true
-    end
-  end
-  self.wndLeftSideScroll:Show(not self.LoadedActions)
-  self.wndRightSide:Show(not self.LoadedActions and self.wndRightSide:GetData())
-  self.wndQuestInfoControls:Show(not self.LoadedActions and self.wndRightSide:GetData())
-  self.wndLeftSideScrollActions:Show(self.LoadedActions)
-  self.wndRightSideAction:Show(false)
-  self.wndActionControls:Show(false)
 end
 
 function QuestLog:HelperSetupMiddleLevelWindow(wndMiddle, epiEpisode)
@@ -1365,18 +1339,6 @@ function QuestLog:OnCollapseAllQuestsBtn(wndHandler, wndControl)
   self:RedrawLeftTree()
   self.wndLeftSideScroll:SetVScrollPos(0)
   self:ResizeTree()
-end
-
-function QuestLog:OnActionItemBtnCheck(wndHandler, wndControl)
-  Print("in btn check")
-  self.wndRightSideAction:Show(true)
-  self.wndActionControls:Show(true)
-end
-
-function QuestLog:OnActionItemBtnUncheck(wndHandler, wndControl)
-  Print("in btn unck")
-  self.wndRightSideAction:Show(false)
-  self.wndActionControls:Show(false)
 end
 
 function QuestLog:ShowContextMenu(wnd, nLevel)
