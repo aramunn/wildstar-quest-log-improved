@@ -1,1 +1,1 @@
-New in 11.1.0: change theme to fit better with codex
+New in 11.2.0: added right-click menu to left side list buttons
