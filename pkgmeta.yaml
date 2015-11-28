@@ -5,5 +5,4 @@ manual-changelog: CHANGES.txt
 
 ignore:
   - README.md
-  - TODO.txt
-  - release
+  - carbine
