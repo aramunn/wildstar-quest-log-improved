@@ -147,6 +147,11 @@ function QuestLog:Initialize()
   self.knObjectivesItemHeight = wndMeasure:GetHeight()
   wndMeasure:Destroy()
 
+  wndMeasure = Apollo.LoadForm(self.xmlDoc, "ContextMenuQuestLogForm", nil, self)
+  self.knContextMenuWidth = wndMeasure:GetWidth()
+  self.knContextMenuHeight = wndMeasure:GetHeight()
+  wndMeasure:Destroy()
+
   self.nRewardRecListHeight = self.wndMain:FindChild("QuestInfoRewardRecFrame"):GetHeight()
   self.nRewardChoListHeight = self.wndMain:FindChild("QuestInfoRewardChoFrame"):GetHeight()
   self.nMoreInfoHeight = self.wndMain:FindChild("QuestInfoMoreInfoFrame"):GetHeight()
@@ -1347,17 +1352,15 @@ function QuestLog:ShowContextMenu(wnd, nLevel)
     self.wndContextMenu = nil
   end
   self.wndContextMenu = Apollo.LoadForm(self.xmlDoc, "ContextMenuQuestLogForm", "TooltipStratum", self)
-  local strContext = wnd:GetText():gsub("^%s*", "")
   local wndButtonList = self.wndContextMenu:FindChild("ButtonList")
-  wndButtonList:DestroyAllPixies()
-  wndButtonList:AddPixie({
-    loc = { fPoints = {0,0,1,0}, nOffsets = {5,3,0,25} },
-    strText = strContext, strFont = "CRB_HeaderTiny", crText = "white",
-  })
   self.wndContextMenu:SetData({ level = nLevel, window = wnd })
   self.wndContextMenu:Invoke()
   local tCursor = Apollo.GetMouse()
-  self.wndContextMenu:Move(tCursor.x - 10, tCursor.y - 25, self.wndContextMenu:GetWidth(), self.wndContextMenu:GetHeight())
+  local tPos = { x = (tCursor.x - 10), y = (tCursor.y - 25) }
+  local tScreen = Apollo.GetDisplaySize()
+  if tPos.x + self.knContextMenuWidth > tScreen.nWidth then tPos.x = tPos.x - self.knContextMenuWidth + 10*2 end
+  if tPos.y + self.knContextMenuHeight > tScreen.nHeight then tPos.y = tPos.y - self.knContextMenuHeight + 25*2 end
+  self.wndContextMenu:Move(tPos.x, tPos.y, self.knContextMenuWidth, self.knContextMenuHeight)
 end
 
 function QuestLog:OnBottomLevelBtnMouseUp(wndHandler, wndControl, eMouseButton)
@@ -1376,7 +1379,11 @@ function QuestLog:HandleContextMenuButton(strButtonName, wnd, nLevel)
   if nLevel == 1 then
     local quest = wnd:GetData()
     local eState = quest:GetState()
-    if strButtonName == "BtnAbandon" and quest:CanAbandon() then quest:Abandon() end
+    if strButtonName == "BtnAbandon" and quest:CanAbandon() then
+      local wndQuestTitle = Apollo.LoadForm(self.xmlDoc, "ContextMenuConfirmListItem", self.wndContextMenu:FindChild("Confirm:List"), self)
+      wndQuestTitle:FindChild("Text"):SetText(quest:GetTitle())
+    end
+    if strButtonName == "BtnAbandonConfirm" and quest:CanAbandon() then quest:Abandon() end
     if strButtonName == "BtnIgnore" and (eState == Quest.QuestState_Abandoned or eState == Quest.QuestState_Mentioned) then quest:ToggleIgnored() end
     if strButtonName == "BtnTrack" then quest:SetTracked(true) end
     if strButtonName == "BtnUntrack" then quest:SetTracked(false) end
@@ -1394,14 +1401,22 @@ end
 function QuestLog:OnRegularBtn(wndHandler, wndControl)
   local tData = self.wndContextMenu:GetData()
   local strButtonName = wndHandler:GetName()
-  self.wndContextMenu:Close()
-  self.wndContextMenu = nil
   self:HandleContextMenuButton(strButtonName, tData.window, tData.level)
   if strButtonName == "BtnIgnore" then
     self:DestroyAndRedraw()
     Apollo.CreateTimer("RedrawQuestLogInOneSec", 1, false)
+    self.wndContextMenu:Close()
+    self.wndContextMenu = nil
+  elseif strButtonName == "BtnAbandon" then
+    self.wndContextMenu:FindChild("Confirm:List"):ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop)
+    self.wndContextMenu:FindChild("Confirm:List"):RecalculateContentExtents()
+    self.wndContextMenu:FindChild("Confirm:Header"):SetText("Abandon these quests?")
+    self.wndContextMenu:FindChild("Confirm:ConfirmBtn"):SetName("BtnAbandonConfirm")
+    self.wndContextMenu:FindChild("Confirm"):Show(true)
   else
     self:RedrawLeftTree()
+    self.wndContextMenu:Close()
+    self.wndContextMenu = nil
   end
 end
 
