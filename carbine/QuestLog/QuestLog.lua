@@ -17,6 +17,7 @@ function QuestLog:new(o)
     o = o or {}
     setmetatable(o, self)
     self.__index = self
+
     return o
 end
 
@@ -83,11 +84,18 @@ function QuestLog:OnDocumentReady()
 	Apollo.RegisterEventHandler("ShowQuestLog", 		"Initialize", self)
 	Apollo.RegisterEventHandler("Dialog_QuestShare", 	"OnDialog_QuestShare", self)
 	Apollo.RegisterTimerHandler("ShareTimeout", 		"OnShareTimeout", self)
-	Apollo.RegisterEventHandler("QuestStateChanged", 	"OnQuestStateChanged", self) -- Routes to OnDestroyQuestObject if completed/botched
+	--Apollo.RegisterEventHandler("QuestStateChanged", 	"OnQuestStateChanged", self) -- Routes to OnDestroyQuestObject if completed/botched
+	
+	Apollo.RegisterEventHandler("EpisodeStateChanged",						"OnEpisodeStateChanged", self)
+	Apollo.RegisterEventHandler("QuestStateChanged",						"OnQuestStateChanged", self)
+	Apollo.RegisterEventHandler("QuestTrackedChanged",						"OnQuestTrackedChanged", self)
+	Apollo.RegisterEventHandler("QuestObjectiveUpdated",					"OnQuestObjectiveUpdated", self)
+	
+	
+	
 	Apollo.RegisterEventHandler("Group_Join",			"OnGroupUpdate", self)
 	Apollo.RegisterEventHandler("Group_Left",			"OnGroupUpdate", self)
 
-	self:Initialize()
 end
 
 function QuestLog:OnInterfaceMenuListHasLoaded()
@@ -99,11 +107,7 @@ function QuestLog:Initialize()
 		return
 	end
 
-	Apollo.RegisterEventHandler("EpisodeStateChanged", 			"DestroyAndRedraw", self) -- Not sure if this can be made stricter
-	Apollo.RegisterEventHandler("QuestObjectiveUpdated", 		"OnQuestObjectiveUpdated", self)
-	Apollo.RegisterEventHandler("QuestTrackedChanged",			"OnQuestTrackedChanged", self)
 	Apollo.RegisterEventHandler("GenericEvent_ShowQuestLog", 	"OnGenericEvent_ShowQuestLog", self)
-	Apollo.RegisterTimerHandler("RedrawQuestLogInOneSec", 		"DestroyAndRedraw", self) -- TODO Remove if possible
 
     self.wndMain = Apollo.LoadForm(self.xmlDoc, "QuestLogForm", g_wndProgressLog:FindChild("ContentWnd_1"), self)
 	self.wndLeftFilterActive = self.wndMain:FindChild("LeftSideFilterBtnsBG:LeftSideFilterBtnShowActive")
@@ -117,6 +121,7 @@ function QuestLog:Initialize()
 	self.wndLastBottomLevelBtnSelection = nil -- Just for button pressed state faking of text color
 	self.nQuestCountMax = QuestLib.GetMaxCount()
 	self.arLeftTreeMap = {}
+	self.tTreeQuestsById = {}
 
 	-- Default states
 	self.wndLeftFilterActive:SetCheck(true)
@@ -158,9 +163,6 @@ function QuestLog:OnGenericEvent_ShowQuestLog(queTarget)
 	self.wndLeftFilterFinished:SetCheck(false)
 	self.wndLeftSideScroll:DestroyChildren()
 
-	local qcTop = queTarget:GetCategory()
-	local epiMid = queTarget:GetEpisode()
-
 	self:RedrawLeftTree() -- Add categories
 
 	if queTarget:GetState() == Quest.QuestState_Unknown then
@@ -172,6 +174,9 @@ function QuestLog:OnGenericEvent_ShowQuestLog(queTarget)
 		return
 	end
 
+	local qcTop = queTarget:GetCategory()
+	local epiMid = queTarget:GetEpisode()
+	
 	local strCategoryKey
 	local strEpisodeKey
 	local strQuestKey
@@ -191,23 +196,23 @@ function QuestLog:OnGenericEvent_ShowQuestLog(queTarget)
 			strQuestKey = strEpisodeKey.."Q"..queTarget:GetId()
 		end
 	end
-
+	
 	if qcTop then
 		local wndTop = self.arLeftTreeMap[strCategoryKey]
-		if wndTop then
-			wndTop:FindChild("TopLevelBtn"):SetCheck(true)
-			self:RedrawLeftTree() -- Add episodes
+		if wndTop ~= nil and wndTop:IsValid() then
+			local wndTopLevelBtn = wndTop:FindChild("TopLevelBtn")
+			wndTopLevelBtn:SetCheck(true)
+			self:OnTopLevelBtnCheck(wndTopLevelBtn, wndTopLevelBtn)
 
 			if epiMid then
 				local wndMiddle = self.arLeftTreeMap[strEpisodeKey]
-				if wndMiddle then
-					wndMiddle:FindChild("MiddleLevelBtn"):SetCheck(true)
-					self:RedrawLeftTree() -- Add quests
+				if wndMiddle ~= nil and wndMiddle:IsValid() then
 
 					local wndBot = self.arLeftTreeMap[strQuestKey]
-					if wndBot then
-						wndBot:FindChild("BottomLevelBtn"):SetCheck(true)
-						self:OnBottomLevelBtnCheck(wndBot:FindChild("BottomLevelBtn"), wndBot:FindChild("BottomLevelBtn"))
+					if wndBot ~= nil and wndBot:IsValid() then
+						local wndBottomLevelBtn = wndBot:FindChild("BottomLevelBtn")
+						wndBottomLevelBtn:SetCheck(true)
+						self:OnBottomLevelBtnCheck(wndBottomLevelBtn, wndBottomLevelBtn)
 					end
 				end
 			end
@@ -216,39 +221,103 @@ function QuestLog:OnGenericEvent_ShowQuestLog(queTarget)
 
 	self:ResizeTree()
 	self:RedrawRight()
+	
+	local nVPos = 0
+	
+	local wndTop = self.arLeftTreeMap[strCategoryKey]
+	if wndTop ~= nil and wndTop:IsValid() then
+		nVPos = nVPos + ({wndTop:GetAnchorOffsets()})[2]
+		
+		local wndMiddle = self.arLeftTreeMap[strEpisodeKey]
+		if wndMiddle ~= nil and wndMiddle:IsValid() then
+			nVPos = nVPos + ({wndMiddle:GetAnchorOffsets()})[2]
+			
+			local wndBot = self.arLeftTreeMap[strQuestKey]
+			if wndBot ~= nil and wndBot:IsValid() then
+				nVPos = nVPos + ({wndBot:GetAnchorOffsets()})[2]
+			end
+		end
+	end	
+	
+	self.wndLeftSideScroll:SetVScrollPos(nVPos)
 end
 
 function QuestLog:DestroyAndRedraw() -- TODO, remove as much as possible that calls this
+	local nVScollPos = 0
+	local strCategoryKey = self.strCurrentCategoryKey
+	local strEpisodeKey = self.strCurrentEpisodeKey
+	local strQuestKey = self.strCurrentQuestKey
+
 	if self.wndMain and self.wndMain:IsValid() then
+		nVScollPos = self.wndLeftSideScroll:GetVScrollPos()
 		self.wndLeftSideScroll:DestroyChildren()
-		self.wndLeftSideScroll:SetVScrollPos(0)
 	end
 
 	self.arLeftTreeMap = {}
 
 	self:RedrawLeftTree() -- Add categories
-
-	-- Show first in Quest Log
-	local wndTop = self.wndLeftSideScroll:GetChildren()[1]
-	if wndTop then
-		wndTop:FindChild("TopLevelBtn"):SetCheck(true)
-		self:RedrawLeftTree() -- Add episodes
-
-		local wndMiddle = wndTop:FindChild("TopLevelItems"):GetChildren()[1]
+	
+	local function fnSelectFirstQuest(wndMiddleLevelItems)
+		local wndBot = wndMiddleLevelItems:GetChildren()[1]
+		if wndBot ~= nil then
+			local wndBottomLevelBtn = wndBot:FindChild("BottomLevelBtn")
+			wndBottomLevelBtn:SetCheck(true)
+			self:OnBottomLevelBtnCheck(wndBottomLevelBtn, wndBottomLevelBtn)
+		end
+	end
+	
+	local function fnSelectFirstEpisode(wndTopLevelItems)
+		local wndMiddle = wndTopLevelItems:GetChildren()[1]
 		if wndMiddle then
-			wndMiddle:FindChild("MiddleLevelBtn"):SetCheck(true)
-			self:RedrawLeftTree() --Add quests
+			fnSelectFirstQuest(wndMiddle:FindChild("MiddleLevelItems"))
+		end
+	end
+	
+	local function fnSelectFirstCategory()
+		local wndTop = self.wndLeftSideScroll:GetChildren()[1]
+		if wndTop ~= nil then
+			local wndTopLevelBtn = wndTop:FindChild("TopLevelBtn")
+			wndTopLevelBtn:SetCheck(true)
+			self:OnTopLevelBtnCheck(wndTopLevelBtn, wndTopLevelBtn)
+			
+			fnSelectFirstEpisode(wndTop:FindChild("TopLevelItems"))
+		end
+	end
+	
+	if strCategoryKey ~= nil then
+		local wndTop = self.arLeftTreeMap[strCategoryKey]
+		if wndTop ~= nil and wndTop:IsValid() then
+			local wndTopLevelBtn = wndTop:FindChild("TopLevelBtn")
+			wndTopLevelBtn:SetCheck(true)
+			self:OnTopLevelBtnCheck(wndTopLevelBtn, wndTopLevelBtn)
 
-			local wndBot = wndMiddle:FindChild("MiddleLevelItems"):GetChildren()[1]
-			if wndBot then
-				wndBot:FindChild("BottomLevelBtn"):SetCheck(true)
-				self:OnBottomLevelBtnCheck(wndBot:FindChild("BottomLevelBtn"), wndBot:FindChild("BottomLevelBtn"))
+			if strEpisodeKey then
+				local wndMiddle = self.arLeftTreeMap[strEpisodeKey]
+				if wndMiddle ~= nil and wndMiddle:IsValid() then
+
+					if strQuestKey then
+						local wndBot = self.arLeftTreeMap[strQuestKey]
+						if wndBot ~= nil and wndBot:IsValid() then
+							local wndBottomLevelBtn = wndBot:FindChild("BottomLevelBtn")
+							wndBottomLevelBtn:SetCheck(true)
+							self:OnBottomLevelBtnCheck(wndBottomLevelBtn, wndBottomLevelBtn)
+						end
+					else
+						fnSelectFirstQuest(wndMiddle:FindChild("MiddleLevelItems"))
+					end
+				end
+			else
+				fnSelectFirstEpisode(wndTop:FindChild("TopLevelItems"))
 			end
 		end
+	else
+		fnSelectFirstCategory()
 	end
 
 	self:ResizeTree()
 	self:RedrawRight()
+	
+	self.wndLeftSideScroll:SetVScrollPos(nVScollPos)
 end
 
 function QuestLog:RedrawLeftTreeFromUI()
@@ -289,22 +358,51 @@ function QuestLog:RedrawRight()
 	self:ResizeRight()
 end
 
-function QuestLog:RedrawLeftTree()
-	local nQuestCount = QuestLib.GetCount()
-	local strColor = "UI_BtnTextGreenNormal"
-	if nQuestCount + 3 >= self.nQuestCountMax then
-		strColor = "ffff0000"
-	elseif nQuestCount + 10 >= self.nQuestCountMax then
-		strColor = "ffffb62e"
+function QuestLog:GetHaveWorldStoryQuestFunctions()
+	local tEpisodeHasWorldStoryQuests = {}
+
+	local function fnEpisodeHasWorldStoryQuests(arCategories, epiEpisode)
+		if tEpisodeHasWorldStoryQuests[epiEpisode] ~= nil then
+			return tEpisodeHasWorldStoryQuests[epiEpisode]
+		end
+	
+		if epiEpisode:IsWorldStory() then
+			for idx2, qcCategory in pairs(arCategories) do
+				for idx3, queQuest in pairs(epiEpisode:GetAllQuests(qcCategory:GetId())) do
+					if self:CheckLeftSideFilters(queQuest) then
+						tEpisodeHasWorldStoryQuests[epiEpisode] = true
+						return true
+					end
+				end
+			end
+		end
+		tEpisodeHasWorldStoryQuests[epiEpisode] = false
+		return false
 	end
 
-	local strActiveQuests = string.format("<T TextColor=\"%s\">%s</T>", strColor, nQuestCount)
-	strActiveQuests = String_GetWeaselString(Apollo.GetString("QuestLog_ActiveQuests"), strActiveQuests, self.nQuestCountMax)
-	self.wndMain:FindChild("QuestLogCountText"):SetAML(string.format("<P Font=\"CRB_InterfaceTiny_BB\" Align=\"Left\" TextColor=\"UI_BtnTextGoldListNormal\">%s</P>", strActiveQuests))
+	local bHasWorldStoryQuests = nil
 
+	local function fnHaveWorldStoryQuests(arCategories, arEpisodes)
+		if bHasWorldStoryQuests ~= nil then
+			return bHasWorldStoryQuests
+		end
+	
+		for idx, epiEpisode in pairs(arEpisodes) do
+			if fnEpisodeHasWorldStoryQuests(arCategories, epiEpisode) then
+				bHasWorldStoryQuests = true
+				return true
+			end
+		end
+		bHasWorldStoryQuests = false
+		return false
+	end
+	
+	return fnHaveWorldStoryQuests, fnEpisodeHasWorldStoryQuests
+end
+
+function QuestLog:GetHaveQuestFunctions()
 	local tCategoryEpisodeHaveQuestsCache = {}
-	local tCategoryHaveQuestsCache = {}
-
+	
 	local fnDoesCategoryEpisodeHaveQuests = function(qcCategory, epiEpisode)
 		local strEpisodeKey = "C"..qcCategory:GetId().."E"..epiEpisode:GetId()
 		if tCategoryEpisodeHaveQuestsCache[strEpisodeKey] ~= nil then
@@ -323,6 +421,8 @@ function QuestLog:RedrawLeftTree()
 		return false
 	end
 
+	local tCategoryHaveQuestsCache = {}
+	
 	local fnDoesCategoryHaveQuests = function(qcCategory)
 		local strCategoryKey = "C"..qcCategory:GetId()
 		if tCategoryHaveQuestsCache[strCategoryKey] ~= nil then
@@ -338,157 +438,135 @@ function QuestLog:RedrawLeftTree()
 		tCategoryHaveQuestsCache[strCategoryKey] = false
 		return false
 	end
+	
+	return fnDoesCategoryHaveQuests, fnDoesCategoryEpisodeHaveQuests
+end
 
-	local arCategories = {}
-	local arEpisodes = {}
-	local arQuests = {}
-	local bHasTasks = false
+function QuestLog:RedrawLeftTree()
+	self.strCurrentCategoryKey = nil
+	self.strCurrentEpisodeKey = nil
+	self.strCurrentQuestKey = nil
+
+	local nQuestCount = QuestLib.GetCount()
+	local strColor = "UI_BtnTextGreenNormal"
+	if nQuestCount + 3 >= self.nQuestCountMax then
+		strColor = "ffff0000"
+	elseif nQuestCount + 10 >= self.nQuestCountMax then
+		strColor = "ffffb62e"
+	end
+
+	local strActiveQuests = string.format("<T TextColor=\"%s\">%s</T>", strColor, nQuestCount)
+	strActiveQuests = String_GetWeaselString(Apollo.GetString("QuestLog_ActiveQuests"), strActiveQuests, self.nQuestCountMax)
+	self.wndMain:FindChild("QuestLogCountText"):SetAML(string.format("<P Font=\"CRB_InterfaceTiny_BB\" Align=\"Left\" TextColor=\"UI_BtnTextGoldListNormal\">%s</P>", strActiveQuests))
 
 	local bShowCompleted = self.wndLeftFilterFinished:IsChecked()
+	
+	local arAllCategories = QuestLib.GetKnownCategories()
 	local arAllEpisodes = QuestLib.GetAllEpisodes(bShowCompleted, true)
-
-	-- Build data for world story
-	local bWorldStoryHasData = false
-	for idx, epiEpisode in pairs(arAllEpisodes) do
-		if epiEpisode:IsWorldStory() then
-			for idx2, qcCategory in pairs(QuestLib.GetKnownCategories()) do
-				for idx3, queQuest in pairs(epiEpisode:GetAllQuests(qcCategory:GetId())) do
-					if self:CheckLeftSideFilters(queQuest) then
-						bWorldStoryHasData = true
-						break
-					end
-				end
-			end
-		end
-		if bWorldStoryHasData then
-			break
-		end
-	end
-
-	if bWorldStoryHasData then
+	
+	local fnHaveWorldStoryQuests, fnEpisodeHasWorldStoryQuests = self:GetHaveWorldStoryQuestFunctions()
+	local fnDoesCategoryHaveQuests, fnDoesCategoryEpisodeHaveQuests = self:GetHaveQuestFunctions()
+	
+	if fnHaveWorldStoryQuests(arAllCategories, arAllEpisodes) then
 		local strCategoryKey = "CWorldStory" -- Why can't we have nice things :(
-		local wndTop = self.arLeftTreeMap[strCategoryKey]
-		if wndTop ~= nil and wndTop:IsValid() and wndTop:FindChild("TopLevelBtn"):IsChecked() then
-			for idx, epiEpisode in pairs(arAllEpisodes) do
-				if epiEpisode:IsWorldStory() then
-
-					local strEpisodeKey = strCategoryKey.."E"..epiEpisode:GetId()
-					local wndMiddle = self.arLeftTreeMap[strEpisodeKey]
-					local bAddQuests = wndMiddle ~= nil and wndMiddle:IsValid() and wndMiddle:FindChild("MiddleLevelBtn"):IsChecked()
-					local bEpHasQuests = false
-					for idx2, qcCategory in pairs(QuestLib.GetKnownCategories()) do
-						for idx3, queQuest in pairs(epiEpisode:GetAllQuests(qcCategory:GetId())) do
-							if self:CheckLeftSideFilters(queQuest) then
-								bEpHasQuests = true
-								if bAddQuests then
-									table.insert(arQuests, queQuest)
-								else
-									break
-								end
-							end
-						end
-						
-						if bEpHasQuests and not bAddQuests then
-							break
-						end
-					end
-					
-					if bEpHasQuests then
-						table.insert(arEpisodes, epiEpisode)
-					end
-				end
-			end
-		end
-	end
-
-	-- Build data
-	for idx1, qcCategory in pairs(QuestLib.GetKnownCategories()) do
-		if fnDoesCategoryHaveQuests(qcCategory) then
-			table.insert(arCategories, qcCategory)
-
-			local strCategoryKey = "C"..qcCategory:GetId()
-			local wndTop = self.arLeftTreeMap[strCategoryKey]
-			if wndTop ~= nil and wndTop:IsValid() and wndTop:FindChild("TopLevelBtn"):IsChecked() then
-				for idx2, epiEpisode in pairs(qcCategory:GetEpisodes()) do
-					if not epiEpisode:IsWorldStory() and fnDoesCategoryEpisodeHaveQuests(qcCategory, epiEpisode) then
-						local arQuestTableToUse
-						local strEpisodeKey
-
-						if epiEpisode:IsZoneStory() or epiEpisode:IsRegionalStory() then
-							table.insert(arEpisodes, epiEpisode)
-							strEpisodeKey = strCategoryKey.."E"..epiEpisode:GetId()
-						else -- task
-							bHasTasks = true
-							strEpisodeKey = strCategoryKey.."ETasks"
-						end
-
-						local wndMiddle = self.arLeftTreeMap[strEpisodeKey]
-						if wndMiddle ~= nil and wndMiddle:IsValid() and wndMiddle:FindChild("MiddleLevelBtn"):IsChecked() then
-							for idx3, queQuest in pairs(epiEpisode:GetAllQuests(qcCategory:GetId())) do
-								if self:CheckLeftSideFilters(queQuest) then
-									table.insert(arQuests, queQuest)
-								end
-							end
-						end
-					end
-				end
-			end
-		end
-	end
-
-	-- Build windows from data
-	local fnBuildCategoryEpisodeQuests = function(strEpisodeKey, wndMiddle)
-		if wndMiddle:FindChild("MiddleLevelBtn"):IsChecked() then
-			local wndMiddleLevelItems = wndMiddle:FindChild("MiddleLevelItems")
-			for idx3, queQuest in pairs(arQuests) do
-				local strQuestKey = strEpisodeKey.."Q"..queQuest:GetId()
-				local wndBot = self:FactoryCacheProduce(wndMiddleLevelItems, "BottomLevelItem", strQuestKey)
-				self:HelperSetupBottomLevelWindow(wndBot, queQuest)
-			end
-		end
-	end
-
-	local fnBuildCategoryEpisodes = function(strCategoryKey, wndTop)
-		if wndTop:FindChild("TopLevelBtn"):IsChecked() then
-			local wndTopLevelItems = wndTop:FindChild("TopLevelItems")
-
-			if #arEpisodes > 0 then
-				for idx2, epiEpisode in pairs(arEpisodes) do
-					local strEpisodeKey = strCategoryKey.."E"..epiEpisode:GetId()
-					local wndMiddle = self:FactoryCacheProduce(wndTopLevelItems, "MiddleLevelItem", strEpisodeKey)
-					self:HelperSetupMiddleLevelWindow(wndMiddle, epiEpisode)
-
-					if epiEpisode:IsZoneStory() then
-						wndMiddle:SetData("Z"..wndMiddle:GetData()) -- Needed for current sorting method so these are top
-					end
-
-					fnBuildCategoryEpisodeQuests(strEpisodeKey, wndMiddle)
-				end
-			end
-
-			if bHasTasks then
-				local strEpisodeKey = strCategoryKey.."ETasks"
-				local wndMiddle = self:FactoryCacheProduce(wndTopLevelItems, "MiddleLevelItem", strEpisodeKey)
-				self:HelperSetupFakeMiddleLevelWindow(wndMiddle, Apollo.GetString("QuestLog_Tasks"))
-				wndMiddle:SetData("")
-
-				fnBuildCategoryEpisodeQuests(strEpisodeKey, wndMiddle)
-			end
-		end
-	end
-
-	if bWorldStoryHasData then
-		local strCategoryKey = "CWorldStory"
 		local wndTop = self:FactoryCacheProduce(self.wndLeftSideScroll, "TopLevelItem", strCategoryKey)
 		wndTop:FindChild("TopLevelBtn"):SetText(Apollo.GetString("QuestLog_WorldStory"))
-		fnBuildCategoryEpisodes(strCategoryKey, wndTop)
+		
+		wndTop:FindChild("TopLevelBtn"):SetData({
+			wndTop = wndTop,
+			strCategoryKey = strCategoryKey,
+			bIsWorldStory = true
+		})
 	end
+	
+	for idx, qcCategory in pairs(arAllCategories) do
+		if fnDoesCategoryHaveQuests(qcCategory) then
+			local strCategoryKey = "C"..qcCategory:GetId()
+			local wndTop = self:FactoryCacheProduce(self.wndLeftSideScroll, "TopLevelItem", strCategoryKey)
+			wndTop:FindChild("TopLevelBtn"):SetText(qcCategory:GetTitle())
+			
+			wndTop:FindChild("TopLevelBtn"):SetData({
+				wndTop = wndTop,
+				strCategoryKey = strCategoryKey,
+				qcCategory = qcCategory,
+				bIsWorldStory = false
+			})
+		end
+	end
+end
 
-	for idx1, qcCategory in pairs(arCategories) do
-		local strCategoryKey = "C"..qcCategory:GetId()
-		local wndTop = self:FactoryCacheProduce(self.wndLeftSideScroll, "TopLevelItem", strCategoryKey)
-		wndTop:FindChild("TopLevelBtn"):SetText(qcCategory:GetTitle())
-		fnBuildCategoryEpisodes(strCategoryKey, wndTop)
+function QuestLog:LeftTreeBuildWorldStoryEpisodes(wndTop, strCategoryKey)
+	local arAllCategories = QuestLib.GetKnownCategories()
+	local arAllEpisodes = QuestLib.GetAllEpisodes(bShowCompleted, true)
+
+	local wndTopLevelItems = wndTop:FindChild("TopLevelItems")
+	for idx, epiEpisode in pairs(arAllEpisodes) do
+		if epiEpisode:IsWorldStory() then
+			for idx, qcCategory in pairs(arAllCategories) do
+				if (function(qcCategory, epiEpisode) 
+					for idx, queQuest in pairs(epiEpisode:GetAllQuests(qcCategory:GetId())) do
+						if self:CheckLeftSideFilters(queQuest) then
+							return true
+						end
+					end
+					return false
+					end)(qcCategory, epiEpisode) then
+					
+					local strEpisodeKey
+					if epiEpisode:IsWorldStory() or epiEpisode:IsZoneStory() or epiEpisode:IsRegionalStory() then
+						strEpisodeKey = strCategoryKey.."E"..epiEpisode:GetId()
+					else
+						strEpisodeKey = strCategoryKey.."ETasks"
+					end
+					
+					local wndMiddle = self:FactoryCacheProduce(wndTopLevelItems, "MiddleLevelItem", strEpisodeKey)
+					self:HelperSetupMiddleLevelWindow(wndMiddle, epiEpisode)
+					
+					local wndMiddleLevelItems = wndMiddle:FindChild("MiddleLevelItems")
+				
+					for idx, queQuest in pairs(epiEpisode:GetAllQuests(qcCategory:GetId())) do
+						if self:CheckLeftSideFilters(queQuest) then
+							local strQuestKey = strEpisodeKey.."Q"..queQuest:GetId()
+							local wndBot = self:FactoryCacheProduce(wndMiddleLevelItems, "BottomLevelItem", strQuestKey)
+							self:HelperSetupBottomLevelWindow(wndBot, queQuest)
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
+function QuestLog:LeftTreeBuildEpisodes(wndTop, strCategoryKey, qcCategory)
+	local fnDoesCategoryHaveQuests, fnDoesCategoryEpisodeHaveQuests = self:GetHaveQuestFunctions()
+
+	local arAllEpisodes = QuestLib.GetAllEpisodes(bShowCompleted, true)
+	local wndTopLevelItems = wndTop:FindChild("TopLevelItems")
+	for idx, epiEpisode in pairs(arAllEpisodes) do
+		if not epiEpisode:IsWorldStory() then
+			if fnDoesCategoryEpisodeHaveQuests(qcCategory, epiEpisode) then
+			
+				local strEpisodeKey
+				if epiEpisode:IsWorldStory() or epiEpisode:IsZoneStory() or epiEpisode:IsRegionalStory() then
+					strEpisodeKey = strCategoryKey.."E"..epiEpisode:GetId()
+				else
+					strEpisodeKey = strCategoryKey.."ETasks"
+				end
+				
+				local wndMiddle = self:FactoryCacheProduce(wndTopLevelItems, "MiddleLevelItem", strEpisodeKey)
+				self:HelperSetupMiddleLevelWindow(wndMiddle, epiEpisode)
+				
+				local wndMiddleLevelItems = wndMiddle:FindChild("MiddleLevelItems")
+				
+				for idx, queQuest in pairs(epiEpisode:GetAllQuests(qcCategory:GetId())) do
+					if self:CheckLeftSideFilters(queQuest) then
+						local strQuestKey = strEpisodeKey.."Q"..queQuest:GetId()
+						local wndBot = self:FactoryCacheProduce(wndMiddleLevelItems, "BottomLevelItem", strQuestKey)
+						self:HelperSetupBottomLevelWindow(wndBot, queQuest)
+					end
+				end
+			end
+		end
 	end
 end
 
@@ -497,8 +575,6 @@ function QuestLog:HelperSetupMiddleLevelWindow(wndMiddle, epiEpisode)
 	wndMiddle:FindChild("MiddleLevelBtnText"):SetText(epiEpisode:GetTitle())
 	wndMiddle:FindChild("MiddleLevelProgBar"):SetMax(tEpisodeProgress.nTotal)
 	wndMiddle:FindChild("MiddleLevelProgBar"):SetProgress(tEpisodeProgress.nCompleted)
-	wndMiddle:FindChild("MiddleLevelIcon"):SetTooltip(self.wndLeftFilterFinished:IsChecked() and "" or Apollo.GetString("QuestLog_MoreQuestsToComplete"))
-	wndMiddle:FindChild("MiddleLevelIcon"):SetSprite("kitIcon_Holo_Checkbox")
 end
 
 function QuestLog:HelperSetupFakeMiddleLevelWindow(wndMiddle, strText)
@@ -506,52 +582,109 @@ function QuestLog:HelperSetupFakeMiddleLevelWindow(wndMiddle, strText)
 	wndMiddle:FindChild("MiddleLevelBtnText"):SetText(strText)
 	wndMiddle:FindChild("MiddleLevelProgBar"):SetMax(tEpisodeProgress.nTotal)
 	wndMiddle:FindChild("MiddleLevelProgBar"):SetProgress(tEpisodeProgress.nCompleted)
-	wndMiddle:FindChild("MiddleLevelIcon"):SetTooltip(self.wndLeftFilterFinished:IsChecked() and "" or Apollo.GetString("QuestLog_MoreQuestsToComplete"))
-	wndMiddle:FindChild("MiddleLevelIcon"):SetSprite(self.wndLeftFilterFinished:IsChecked() and "kitIcon_Holo_Checkbox" or "kitIcon_Holo_Exclamation")
 end
 
 function QuestLog:HelperSetupBottomLevelWindow(wndBot, queQuest)
+	self.tTreeQuestsById[queQuest:GetId()] = wndBot
+
 	local wndBottomLevelBtn = wndBot:FindChild("BottomLevelBtn")
+	local wndBottomLevelTrackBtn = wndBot:FindChild("BottomLevelTrackQuestBtn")
 	local wndBottomLevelBtnText = wndBot:FindChild("BottomLevelBtnText")
-
+	local bIsTracked = queQuest:IsTracked()
+	
+	if queQuest:IsInLog() then
+		wndBottomLevelTrackBtn:Enable(true)
+		wndBottomLevelTrackBtn:SetData(queQuest)
+	else
+		wndBottomLevelTrackBtn:Enable(false)
+		wndBottomLevelTrackBtn:SetTooltip("This quest cannot be tracked yet.")
+	end
+	
+	wndBottomLevelTrackBtn:SetCheck(bIsTracked)
+	wndBottomLevelTrackBtn:SetTooltip(bIsTracked and Apollo.GetString("QuestTracker_StopTracking") or Apollo.GetString("QuestLog_AddToTracker"))
+		
 	local bOptionalQuest = queQuest:IsOptionalForEpisode(queQuest:GetEpisode():GetId())
-	wndBottomLevelBtn:SetData(queQuest)
-	wndBottomLevelBtnText:SetText(bOptionalQuest and String_GetWeaselString(Apollo.GetString("QuestLog_OptionalAppend"), queQuest:GetTitle()) or queQuest:GetTitle())
-	wndBottomLevelBtn:SetText(bOptionalQuest and String_GetWeaselString(Apollo.GetString("QuestLog_OptionalAppend"), queQuest:GetTitle()) or queQuest:GetTitle())
+	local strLevel = String_GetWeaselString(Apollo.GetString("CRB_BracketsNumber_Space"), queQuest:GetConLevel())
+	local strQuestTitle = strLevel..String_GetWeaselString(queQuest:GetTitle())
+	local strQuestTitleOptional = strLevel..String_GetWeaselString(Apollo.GetString("QuestLog_OptionalAppend"), queQuest:GetTitle())
 
-	local strBottomLevelIconSprite = ""
+	wndBottomLevelBtn:SetData(queQuest)
+	wndBottomLevelBtnText:SetText(bOptionalQuest and strQuestTitleOptional or strQuestTitle)
+	wndBottomLevelBtn:SetText(bOptionalQuest and strQuestTitleOptional or strQuestTitle)
+
+	local strBottomLevelIconSprite = "QuestLogSprites:sprQuestDotComplete"
 	local bHasCall = queQuest:GetContactInfo()
 	local eState = queQuest:GetState()
-	if eState == Quest.QuestState_Botched then
-		strBottomLevelIconSprite = "CRB_Basekit:kitIcon_Metal_CircleX"
-	elseif eState == Quest.QuestState_Abandoned or eState == Quest.QuestState_Mentioned then
-		strBottomLevelIconSprite = "CRB_Basekit:kitIcon_Metal_CircleExclamation"
-	elseif eState == Quest.QuestState_Achieved and bHasCall then
-		strBottomLevelIconSprite = "CRB_Basekit:kitIcon_Metal_CircleCheckmarkAccent"
-	elseif eState == Quest.QuestState_Achieved and not bHasCall then
-		strBottomLevelIconSprite = "CRB_Basekit:kitIcon_Metal_CircleCheckmark"
+	
+	if eState == Quest.QuestState_Botched or eState == Quest.QuestState_Abandoned or eState == Quest.QuestState_Mentioned then
+		strBottomLevelIconSprite = "QuestLogSprites:sprQuestDotUnknown"
+	elseif eState == Quest.QuestState_Achieved then
+		strBottomLevelIconSprite = "QuestLogSprites:sprQuestDotActive"
 	end
 	wndBot:FindChild("BottomLevelBtnIcon"):SetSprite(strBottomLevelIconSprite)
 end
 
-function QuestLog:ResizeTree()
-	local wndDeepestSelected = nil
+function QuestLog:HelperRemoveBottomLevelWindow(wndBot, queQuest)
+	self.tTreeQuestsById[queQuest:GetId()] = nil
+	
+	local qcCategory = queQuest:GetCategory()
+	local epiEpisode = queQuest:GetEpisode()
+	
+	local strCategoryKey
+	local strEpisodeKey
+	local strQuestKey
 
+	if epiEpisode:IsWorldStory() then
+		strCategoryKey = "CWorldStory"
+		strEpisodeKey = strCategoryKey.."E"..epiEpisode:GetId()
+		strQuestKey = strEpisodeKey.."Q"..queQuest:GetId()
+	elseif epiEpisode:IsZoneStory() or epiEpisode:IsRegionalStory() then
+		strCategoryKey = "C"..qcCategory:GetId()
+		strEpisodeKey = strCategoryKey.."E"..epiEpisode:GetId()
+		strQuestKey = strEpisodeKey.."Q"..queQuest:GetId()
+	else
+		strCategoryKey = "C"..qcCategory:GetId()
+		strEpisodeKey = strCategoryKey.."ETasks"
+		strQuestKey = strEpisodeKey.."Q"..queQuest:GetId()
+	end
+	
+	local wndBottom = self.arLeftTreeMap[strQuestKey]
+	if wndBottom ~= nil and wndBottom:IsValid() then
+		wndBottom:Destroy()
+	end
+	
+	local fnDoesCategoryHaveQuests, fnDoesCategoryEpisodeHaveQuests = self:GetHaveQuestFunctions()
+	local fnHaveWorldStoryQuests, fnEpisodeHasWorldStoryQuests = self:GetHaveWorldStoryQuestFunctions()
+		
+	if (epiEpisode:IsWorldStory() and not fnHaveWorldStoryQuests(QuestLib.GetKnownCategories(), QuestLib.GetAllEpisodes(self.wndLeftFilterFinished:IsChecked(), true)))
+		or (not epiEpisode:IsWorldStory() and not fnDoesCategoryHaveQuests(qcCategory)) then
+		
+		local wndTop = self.arLeftTreeMap[strCategoryKey]
+		if wndTop ~= nil and wndTop:IsValid() then
+			wndTop:Destroy()
+		end
+	elseif (epiEpisode:IsWorldStory() and not fnEpisodeHasWorldStoryQuests(QuestLib.GetKnownCategories(), epiEpisode))
+		or (not epiEpisode:IsWorldStory() and not fnDoesCategoryEpisodeHaveQuests(qcCategory, epiEpisode)) then
+		
+		local wndMiddle = self.arLeftTreeMap[strEpisodeKey]
+		if wndMiddle ~= nil and wndMiddle:IsValid() then
+			wndMiddle:Destroy()
+		end
+	end
+	
+	self:ResizeTree()
+end
+
+function QuestLog:ResizeTree()
 	for idx1, wndTop in pairs(self.wndLeftSideScroll:GetChildren()) do
 		local wndTopLevelBtn = wndTop:FindChild("TopLevelBtn")
 		local wndTopLevelItems = wndTop:FindChild("TopLevelItems")
 
 		if wndTopLevelBtn:IsChecked() then
-			wndDeepestSelected = wndTop
 			for idx2, wndMiddle in pairs(wndTopLevelItems:GetChildren()) do
+				local wndMiddleTitle = wndMiddle:FindChild("MiddleLevelTitle")
 				local wndMiddleLevelItems = wndMiddle:FindChild("MiddleLevelItems")
-
-				if not wndMiddle:FindChild("MiddleLevelBtn"):IsChecked() then
-					wndMiddleLevelItems:DestroyChildren()
-				else
-					wndDeepestSelected = wndMiddle
-				end
-
+				
 				for idx3, wndBot in pairs(wndMiddleLevelItems:GetChildren()) do -- Resize if too long
 
 					local wndBottomLevelBtnText = wndBot:FindChild("BottomLevelBtn:BottomLevelBtnText")
@@ -559,22 +692,18 @@ function QuestLog:ResizeTree()
 
 					if wndBottomLevelBtnText:GetHeight() >= 25 then
 						local nLeft, nTop, nRight, nBottom = wndBot:GetAnchorOffsets()
-						wndBot:SetAnchorOffsets(nLeft, nTop, nRight, nTop + 50)
+						wndBot:SetAnchorOffsets(nLeft, nTop, nRight, nTop + 40)
 					end
 
 					if wndBottomLevelBtnText:GetHeight() >= 50 then
 						local nLeft, nTop, nRight, nBottom = wndBot:GetAnchorOffsets()
-						wndBot:SetAnchorOffsets(nLeft, nTop, nRight, nTop + 69)
-					end
-
-					if wndBot:FindChild("BottomLevelBtn"):IsChecked() then
-						wndDeepestSelected = wndBot
+						wndBot:SetAnchorOffsets(nLeft, nTop, nRight, nTop + 55)
 					end
 				end
 
 				local nItemHeights = wndMiddleLevelItems:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop)
 				if nItemHeights > 0 then
-					nItemHeights = nItemHeights + 7
+					nItemHeights = nItemHeights + 4
 				end
 
 				local nMiddleLeft, nMiddleTop, nMiddleRight, nMiddleBottom = wndMiddle:GetAnchorOffsets()
@@ -586,20 +715,27 @@ function QuestLog:ResizeTree()
 		wndTopLevelItems:SetSprite(wndTopLevelBtn:IsChecked() and "kitInnerFrame_MetalGold_FrameBright2" or "kitInnerFrame_MetalGold_FrameDull")
 
 		local nItemHeights = wndTopLevelItems:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop, function(a,b) return a:GetData() > b:GetData() end) -- Tasks to bottom
-		if nItemHeights > 0 then
-			nItemHeights = nItemHeights + 12
-		end
 
 		local nTopLeft, nTopTop, nTopRight, nTopBottom = wndTop:GetAnchorOffsets()
 		wndTop:SetAnchorOffsets(nTopLeft, nTopTop, nTopRight, nTopTop + self.knTopLevelHeight + nItemHeights)
 	end
 
-	self.wndLeftSideScroll:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop)
+	self.wndLeftSideScroll:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop, function(wndLeft, wndRight)
+		local leftData = wndLeft:GetData()
+		
+		if leftData == "CWorldStory" then
+			return true
+		end
+		
+		local rightData = wndRight:GetData()
+		
+		if rightData == "CWorldStory" then
+			return false
+		end
+		
+		return leftData < rightData
+	end)
 	self.wndLeftSideScroll:RecalculateContentExtents()
-
-	if wndDeepestSelected ~= nil then
-		self.wndLeftSideScroll:EnsureChildVisible(wndDeepestSelected)
-	end
 end
 
 function QuestLog:ResizeRight()
@@ -607,8 +743,16 @@ function QuestLog:ResizeRight()
 
 	-- Objectives Content
 	for key, wndObj in pairs(self.wndMain:FindChild("QuestInfoObjectivesList"):GetChildren()) do
-		nWidth, nHeight = wndObj:FindChild("ObjectivesItemText"):SetHeightToContentHeight()
-		nHeight = wndObj:FindChild("QuestProgressItem") and nHeight + wndObj:FindChild("QuestProgressItem"):GetHeight() or nHeight
+
+		if wndObj:FindChild("ObjectivesItemText") then
+			nWidth, nHeight = wndObj:FindChild("ObjectivesItemText"):SetHeightToContentHeight()
+		end
+		if wndObj:FindChild("QuestProgressItem") then
+			nHeight = nHeight + wndObj:FindChild("QuestProgressItem"):GetHeight()
+		end
+		if wndObj:FindChild("SpellItemBtn") then
+			nHeight = nHeight + wndObj:FindChild("SpellItemBtn"):GetHeight()
+		end
 		nLeft, nTop, nRight, nBottom = wndObj:GetAnchorOffsets()
 		wndObj:SetAnchorOffsets(nLeft, nTop, nRight, nTop + math.max(self.knObjectivesItemHeight, nHeight + 8)) -- TODO: Hardcoded formatting of text pad
 	end
@@ -707,36 +851,38 @@ function QuestLog:DrawRightSide(queSelected)
 		strQuestSummary = queSelected:GetSummary()
 	end
 	
-	local nDifficultyLevel = queSelected:GetColoredDifficulty() or 1
-	local tConData = ktConToUI[nDifficultyLevel]
-	local strDifficulty = String_GetWeaselString(Apollo.GetString("QuestLog_Difficulty"), 
-		"<T Font=\"CRB_InterfaceMedium\" TextColor=\""..tConData[2].."\"> "
-		..String_GetWeaselString(Apollo.GetString("QuestLog_DifficultyTextAndNumber"), tConData[3], nDifficultyLevel).."</T>")
-	wndRight:FindChild("QuestInfoDifficultyPic"):SetSprite(tConData[1])
-	wndRight:FindChild("QuestInfoDifficultyPic"):SetTooltip(String_GetWeaselString(Apollo.GetString("QuestLog_IntendedLevel"), queSelected:GetTitle(), queSelected:GetConLevel()))
-	wndRight:FindChild("QuestInfoDifficultyText"):SetAML("<P Font=\"CRB_InterfaceMedium_BB\" TextColor=\"UI_TextHoloBodyHighlight\">"..strDifficulty.."</P>")
+	local nConLevel = queSelected:GetConLevel()
+	local strDifficulty = String_GetWeaselString(Apollo.GetString("Tradeskills_Level"), nConLevel)
+	wndRight:FindChild("QuestInfoDifficultyText"):SetAML(string.format("<P Font=\"CRB_HeaderTiny\" TextColor=\"UI_TextHoloBodyHighlight\">%s</P>", strDifficulty))
 
-	local bOptionalQuest = queSelected:IsOptionalForEpisode(epiParent:GetId())
-	wndRight:FindChild("QuestInfoTitle"):SetTextColor(ApolloColor.new("UI_TextHoloTitle"))
+	local bOptionalQuest = queSelected:IsOptionalForEpisode(epiParent:GetId())	
 	local strTitle = bOptionalQuest and String_GetWeaselString(Apollo.GetString("QuestLog_OptionalAppend"), queSelected:GetTitle()) or queSelected:GetTitle()
-	wndRight:FindChild("QuestInfoTitle"):SetText(strTitle)
+	local strTextColor = "UI_TextHoloTitle"
 
 	if eQuestState == Quest.QuestState_Completed then
 		wndRight:FindChild("QuestInfoTitleIcon"):SetTooltip(Apollo.GetString("QuestLog_HasBeenCompleted"))
 		wndRight:FindChild("QuestInfoTitleIcon"):SetSprite("CRB_Basekit:kitIcon_Green_Checkmark")
-		wndRight:FindChild("QuestInfoTitle"):SetText(String_GetWeaselString(Apollo.GetString("QuestLog_Completed"), strTitle))
-		wndRight:FindChild("QuestInfoTitle"):SetTextColor(ApolloColor.new("UI_WindowTextChallengeGreenFlash"))
+		strTitle = String_GetWeaselString(Apollo.GetString("QuestLog_Completed"), strTitle)
+		strTextColor = "UI_WindowTextChallengeGreenFlash"
 	elseif eQuestState == Quest.QuestState_Achieved then
 		wndRight:FindChild("QuestInfoTitleIcon"):SetTooltip(Apollo.GetString("QuestLog_QuestReadyToTurnIn"))
 		wndRight:FindChild("QuestInfoTitleIcon"):SetSprite("CRB_Basekit:kitIcon_Green_Checkmark")
+		strTextColor = "UI_WindowTextChallengeGreenFlash"
 	else
 		wndRight:FindChild("QuestInfoTitleIcon"):SetTooltip(Apollo.GetString("QuestLog_ObjectivesNotComplete"))
 		wndRight:FindChild("QuestInfoTitleIcon"):SetSprite("CRB_Basekit:kitIcon_Gold_Checkbox")
 	end
 
-	wndRight:FindChild("QuestInfoDescriptionText"):SetAML("<P Font=\"CRB_InterfaceMedium\" TextColor=\"UI_TextHoloBodyCyan\">"..strQuestSummary.."</P>")
+	wndRight:FindChild("QuestInfoTitle"):SetAML(string.format("<P Font=\"CRB_Header13\" TextColor=\"%s\">%s</P>", strTextColor ,strTitle))
+	wndRight:FindChild("QuestInfoTitle"):SetHeightToContentHeight()
+		
+	wndRight:FindChild("QuestInfoDescriptionText"):SetAML(string.format("<P Font=\"CRB_InterfaceMedium\" TextColor=\"UI_TextHoloBodyCyan\">%s</P>", strQuestSummary))
 	wndRight:FindChild("QuestInfoDescriptionText"):SetHeightToContentHeight()
 
+	local nTitleAndEtcHeight = wndRight:FindChild("RightColumn"):ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop)
+	local nLeft, nTop, nRight, nBottom = wndRight:FindChild("QuestInfoTitleAndEtcFrame"):GetAnchorOffsets()
+	wndRight:FindChild("QuestInfoTitleAndEtcFrame"):SetAnchorOffsets(nLeft, nTop, nRight, nTop + nTitleAndEtcHeight)
+	
 	-- More Info
 	local strMoreInfo = ""
 	local tMoreInfoText = queSelected:GetMoreInfoText()
@@ -775,9 +921,17 @@ function QuestLog:DrawRightSide(queSelected)
 				local wndObj = Apollo.LoadForm(self.xmlDoc, "ObjectivesItem", wndRight:FindChild("QuestInfoObjectivesList"), self)
 				wndObj:FindChild("ObjectivesItemText"):SetAML(self:HelperBuildObjectiveTitleString(queSelected, tObjData))
 			end
+			-- Objective Spell
+			if queSelected:GetSpell(tObjData.nIndex) then
+				wndSpell = Apollo.LoadForm(self.xmlDoc, "SpellItem", wndRight:FindChild("QuestInfoObjectivesList"), self)
+
+				wndSpell:FindChild("SpellItemBtn"):SetContentId(queSelected, tObjData.nIndex)
+				wndSpell:FindChild("SpellItemBtn"):SetText(String_GetWeaselString(GameLib.GetKeyBinding("CastObjectiveAbility")))				
+			end
 		end
 		wndRight:FindChild("QuestInfoObjectivesTitle"):SetText(Apollo.GetString("QuestLog_Objectives"))
 	end
+	wndRight:FindChild("QuestInfoObjectivesList"):ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop)
 
 	-- Rewards Received
 	local tRewardInfo = queSelected:GetRewardData()
@@ -785,6 +939,13 @@ function QuestLog:DrawRightSide(queSelected)
 	for key, tReward in pairs(tRewardInfo.arFixedRewards) do
 		local wndReward = Apollo.LoadForm(self.xmlDoc, "RewardItem", wndRight:FindChild("QuestInfoRewardRecList"), self)
 		self:HelperBuildRewardsRec(wndReward, tReward, true)
+	end
+
+	-- XP Received
+	local nRewardXP = queSelected:CalcRewardXP()
+	if nRewardXP > 0 then
+		local wndReward = Apollo.LoadForm(self.xmlDoc, "RewardItem", wndRight:FindChild("QuestInfoRewardRecList"), self)	
+		self:HelperBuildXPRewardsRec(wndReward, nRewardXP)
 	end
 
 	-- Rewards To Choose
@@ -820,13 +981,8 @@ function QuestLog:DrawRightSide(queSelected)
 	self.wndMain:FindChild("QuestInfoControlButtons"):Show(eQuestState == Quest.QuestState_Accepted or eQuestState == Quest.QuestState_Achieved or eQuestState == Quest.QuestState_Botched)
 	if eQuestState ~= Quest.QuestState_Abandoned then
 		self:OnGroupUpdate()
-		local bIsTracked = queSelected:IsTracked()
 		self.wndMain:FindChild("QuestAbandonPopoutBtn"):Enable(queSelected:CanAbandon())
-		self.wndMain:FindChild("QuestTrackBtn"):Enable(eQuestState ~= Quest.QuestState_Botched)
-		self.wndMain:FindChild("QuestTrackBtn"):SetText(bIsTracked and Apollo.GetString("QuestLog_Untrack") or Apollo.GetString("QuestLog_Track"))
-		self.wndMain:FindChild("QuestTrackBtn"):SetTooltip(bIsTracked and Apollo.GetString("QuestLog_RemoveFromTracker") or Apollo.GetString("QuestLog_AddToTracker"))
 	end
-	--self.wndMain:FindChild("QuestInfoControlButtons"):ArrangeChildrenHorz(Window.CodeEnumArrangeOrigin.Middle)
 
 	-- Hide Pop Out CloseOnExternalClick windows
 	self.wndMain:FindChild("QuestAbandonConfirm"):Show(false)
@@ -841,7 +997,7 @@ function QuestLog:OnGroupUpdate()
 	if queSelected and queSelected:GetState() ~= Quest.QuestState_Abandoned then
 		local bCanShare = queSelected:CanShare()
 		local strCantShareTooltip = String_GetWeaselString(Apollo.GetString("QuestLog_ShareNotPossible"), Apollo.GetString("QuestLog_ShareQuest"))
-		self.wndMain:FindChild("QuestInfoControlsBGShare"):Show(bCanShare)
+		self.wndMain:FindChild("QuestShareBtn"):Enable(bCanShare)
 		self.wndMain:FindChild("QuestInfoControlsBGShare"):SetTooltip(bCanShare and Apollo.GetString("QuestLog_ShareQuest") or strCantShareTooltip)
 	end
 end
@@ -858,8 +1014,11 @@ function QuestLog:DrawUnknownRightSide(queSelected)
 	local epiParent = queSelected:GetEpisode()
 	local bIsTasks = true
 	local strEpisodeDesc = ""
+	local bOptionalQuest = false
+	
 	if epiParent then
 		bIsTasks = epiParent:GetId() == 1
+		bOptionalQuest = queSelected:IsOptionalForEpisode(epiParent:GetId())	
 		if not bIsTasks then
 			strEpisodeDesc = epiParent:GetState() == Episode.EpisodeState_Complete and epiParent:GetSummary() or epiParent:GetDesc()
 		end
@@ -896,20 +1055,19 @@ function QuestLog:DrawUnknownRightSide(queSelected)
 		strQuestSummary = queSelected:GetSummary()
 	end
 
-	local tConData = ktConToUI[queSelected:GetColoredDifficulty() or 1]
-	local strDifficulty = String_GetWeaselString(Apollo.GetString("QuestLog_Difficulty"), "<T Font=\"CRB_InterfaceMedium\" TextColor=\""..tConData[2].."\"> "..tConData[3].."</T>")
-	wndRight:FindChild("QuestInfoDifficultyPic"):SetSprite(tConData[1])
-	wndRight:FindChild("QuestInfoDifficultyPic"):SetTooltip(String_GetWeaselString(Apollo.GetString("QuestLog_IntendedLevel"), queSelected:GetTitle(), queSelected:GetConLevel()))
-	wndRight:FindChild("QuestInfoDifficultyText"):SetAML("<P Font=\"CRB_InterfaceMedium_B\" TextColor=\"UI_TextHoloBodyHighlight\">"..strDifficulty.."</P>")
+	local nConLevel = queSelected:GetConLevel()
+	local strDifficulty = String_GetWeaselString(Apollo.GetString("Tradeskills_Level"), nConLevel )
+	wndRight:FindChild("QuestInfoDifficultyText"):SetAML("<P Font=\"CRB_HeaderTiny\" TextColor=\"UI_TextHoloBodyHighlight\">"..strDifficulty.."</P>")
 
-	local bOptionalQuest = epiParent and queSelected:IsOptionalForEpisode(epiParent:GetId()) or false
-	wndRight:FindChild("QuestInfoTitle"):SetTextColor(ApolloColor.new("white"))
 	local strTitle = bOptionalQuest and String_GetWeaselString(Apollo.GetString("QuestLog_OptionalAppend"), queSelected:GetTitle()) or queSelected:GetTitle()
-	wndRight:FindChild("QuestInfoTitle"):SetText(strTitle)
+	local strTextColor = "UI_TextHoloTitle"
 
 	wndRight:FindChild("QuestInfoTitleIcon"):SetTooltip(Apollo.GetString("QuestLog_ObjectivesNotComplete"))
 	wndRight:FindChild("QuestInfoTitleIcon"):SetSprite("CRB_Basekit:kitIcon_Gold_Checkbox")
 
+	wndRight:FindChild("QuestInfoTitle"):SetAML(string.format("<P Font=\"CRB_Header13\" TextColor=\"%s\">%s</P>", strTextColor, strTitle))
+	wndRight:FindChild("QuestInfoTitle"):SetHeightToContentHeight()	
+	
 	wndRight:FindChild("QuestInfoDescriptionText"):SetAML("<P Font=\"CRB_InterfaceMedium\" TextColor=\"ff56b381\">"..strQuestSummary.."</P>")
 	wndRight:FindChild("QuestInfoDescriptionText"):SetHeightToContentHeight()
 
@@ -951,29 +1109,21 @@ function QuestLog:DrawUnknownRightSide(queSelected)
 end
 
 function QuestLog:OnTopLevelBtnCheck(wndHandler, wndControl)
-	self:RedrawLeftTree()
-	self:ResizeTree()
-end
-
-function QuestLog:OnTopLevelBtnUncheck(wndHandler, wndControl)
-	self:ResizeTree()
-end
-
-function QuestLog:OnMiddleLevelBtnCheck(wndHandler, wndControl)
-	local nScrollPos = self.wndLeftSideScroll:GetVScrollPos()
-	wndHandler:SetCheck(true)
-	self:RedrawLeftTree()
-	self:ResizeTree()
-	self.wndLeftSideScroll:SetVScrollPos(nScrollPos)
-
-	local wndBot = wndHandler:GetParent():FindChild("MiddleLevelItems"):GetChildren()[1]
-	if wndBot then
-		wndBot:FindChild("BottomLevelBtn"):SetCheck(true)
-		self:OnBottomLevelBtnCheck(wndBot:FindChild("BottomLevelBtn"), wndBot:FindChild("BottomLevelBtn"))
+	if wndHandler ~= wndControl then
+		return
 	end
+	
+	local tData = wndControl:GetData()
+	if tData.bIsWorldStory then
+		self:LeftTreeBuildWorldStoryEpisodes(tData.wndTop, tData.strCategoryKey)
+	else
+		self:LeftTreeBuildEpisodes(tData.wndTop, tData.strCategoryKey, tData.qcCategory)
+	end
+	
+	self:ResizeTree()
 end
 
-function QuestLog:OnMiddleLevelBtnUncheck(wndHandler, wndControl)
+function QuestLog:OnTopLevelBtnUncheck(wndHandler, wndControl)	
 	self:ResizeTree()
 end
 
@@ -1002,12 +1152,17 @@ end
 -- Bottom Buttons and Quest Update Events
 -----------------------------------------------------------------------------------------------
 
-function QuestLog:OnQuestTrackBtn(wndHandler, wndControl) -- QuestTrackBtn
-	local queSelected = self.wndRightSide:GetData()
-	local bNewTrackValue = not queSelected:IsTracked()
-	queSelected:SetTracked(bNewTrackValue)
-	self.wndMain:FindChild("QuestTrackBtn"):SetText(bNewTrackValue and Apollo.GetString("QuestLog_Untrack") or Apollo.GetString("QuestLog_Track"))
-	self.wndMain:FindChild("QuestTrackBtn"):SetTooltip(bNewTrackValue and Apollo.GetString("QuestLog_RemoveFromTracker") or Apollo.GetString("QuestLog_AddToTracker"))
+function QuestLog:OnQuestTrackCheckBtn(wndHandler, wndControl) -- QuestTrackCheckBtn
+	local queSelected = wndControl:GetData()
+	queSelected:SetTracked(true)
+	wndControl:SetTooltip(Apollo.GetString("QuestTracker_StopTracking"))
+	Event_FireGenericEvent("GenericEvent_QuestLog_TrackBtnClicked", queSelected)
+end
+
+function QuestLog:OnQuestTrackUncheckBtn(wndHandler, wndControl) -- QuestTrackCheckBtn
+	local queSelected = wndControl:GetData()
+	queSelected:SetTracked(false)
+	wndControl:SetTooltip(Apollo.GetString("QuestLog_AddToTracker"))
 	Event_FireGenericEvent("GenericEvent_QuestLog_TrackBtnClicked", queSelected)
 end
 
@@ -1022,11 +1177,14 @@ function QuestLog:OnQuestCallBtn(wndHandler, wndControl) -- QuestCallBtn or Ques
 	Event_FireGenericEvent("ToggleCodex") -- Hide codex, not sure if we want this
 end
 
+function QuestLog:OnQuestLinkBtn(wndHandler, wndControl)
+	local queSelected = self.wndRightSide:GetData()
+	Event_FireGenericEvent("GenericEvent_QuestLink", queSelected)
+end
+
 function QuestLog:OnQuestAbandonBtn(wndHandler, wndControl) -- QuestAbandonBtn
 	local queSelected = self.wndRightSide:GetData()
 	queSelected:Abandon()
-	self:OnDestroyQuestObject(queUpdated)
-	self:DestroyAndRedraw()
 	self.wndRightSide:Show(false)
 	self.wndQuestInfoControls:Show(false)
 end
@@ -1034,11 +1192,8 @@ end
 function QuestLog:OnQuestHideBtn(wndHandler, wndControl) -- QuestInfoControlsHideBtn
 	local queSelected = self.wndRightSide:GetData()
 	queSelected:ToggleIgnored()
-	self:OnDestroyQuestObject(queSelected)
-	self:DestroyAndRedraw()
 	self.wndRightSide:Show(false)
 	self.wndQuestInfoControls:Show(false)
-	Apollo.CreateTimer("RedrawQuestLogInOneSec", 1, false) -- TODO TEMP HACK, since Quest:ToggleIgnored() takes a while
 end
 
 function QuestLog:OnQuestAbandonPopoutClose(wndHandler, wndControl) -- QuestAbandonPopoutClose
@@ -1049,18 +1204,124 @@ end
 -- State Updates
 -----------------------------------------------------------------------------------------------
 
+function QuestLog:OnEpisodeStateChanged(idEpisode, eOldState, eNewState)
+	if self.wndMain == nil or not self.wndMain:IsValid() then
+		return
+	end
+
+	local epiEpisode = QuestLib.GetEpisode(idEpisode)
+	if epiEpisode == nil then
+		return
+	end
+	
+	local fnDoesCategoryHaveQuests, fnDoesCategoryEpisodeHaveQuests = self:GetHaveQuestFunctions()
+	local fnHaveWorldStoryQuests, fnEpisodeHasWorldStoryQuests = self:GetHaveWorldStoryQuestFunctions()
+	local arAllCategories = QuestLib.GetKnownCategories()
+	
+	if epiEpisode:IsWorldStory() then
+		if not fnHaveWorldStoryQuests(arAllCategories, QuestLib.GetAllEpisodes(self.wndLeftFilterFinished:IsChecked(), true)) then
+			
+			local wndTop = self.arLeftTreeMap["CWorldStory"]
+			if wndTop ~= nil and wndTop:IsValid() then
+				wndTop:Destroy()
+			end
+		elseif not fnEpisodeHasWorldStoryQuests(arAllCategories, epiEpisode) then
+			
+			local wndMiddle = self.arLeftTreeMap["CWorldStory".."E"..epiEpisode:GetId()]
+			if wndMiddle ~= nil and wndMiddle:IsValid() then
+				wndMiddle:Destroy()
+			end
+		end
+	else
+		for idx, qcCategory in pairs(arAllCategories) do
+			if not fnDoesCategoryHaveQuests(qcCategory) then
+			
+				local wndTop = self.arLeftTreeMap["C"..qcCategory:GetId()]
+				if wndTop ~= nil and wndTop:IsValid() then
+					wndTop:Destroy()
+				end
+			elseif not fnDoesCategoryEpisodeHaveQuests(qcCategory, epiEpisode) then
+				
+				local wndMiddle = self.arLeftTreeMap["C"..qcCategory:GetId().."E"..epiEpisode:GetId()]
+				if wndMiddle ~= nil and wndMiddle:IsValid() then
+					wndMiddle:Destroy()
+				end
+			end
+		end
+	end
+	
+	self:ResizeTree()
+end
+
 function QuestLog:OnQuestStateChanged(queUpdated, eState)
 	if self.wndMain and self.wndMain:IsValid() then
-		if eState == Quest.QuestState_Abandoned or eState == Quest.QuestState_Completed or eState == Quest.QuestState_Accepted or eState == Quest.QuestState_Achieved then
-			self:OnDestroyQuestObject(queUpdated)
-			self:DestroyAndRedraw()
-		else -- Botched, Mentioned, Ignored, Unknown
-			self:RedrawEverything()
-
-			local queCurrent = self.wndRightSide:GetData()
-			if queCurrent and queCurrent:GetId() == queUpdated:GetId() then
-				self.wndRightSide:Show(false)
-				self.wndQuestInfoControls:Show(false)
+		if self:CheckLeftSideFilters(queUpdated) then
+			
+			local qcCategory = queUpdated:GetCategory()
+			local epiEpisode = queUpdated:GetEpisode()
+			
+			local strCategoryKey
+			local strEpisodeKey
+			local strQuestKey
+		
+			if epiEpisode:IsWorldStory() then
+				strCategoryKey = "CWorldStory"
+				strEpisodeKey = strCategoryKey.."E"..epiEpisode:GetId()
+				strQuestKey = strEpisodeKey.."Q"..queUpdated:GetId()
+			elseif epiEpisode:IsZoneStory() or epiEpisode:IsRegionalStory() then
+				strCategoryKey = "C"..qcCategory:GetId()
+				strEpisodeKey = strCategoryKey.."E"..epiEpisode:GetId()
+				strQuestKey = strEpisodeKey.."Q"..queUpdated:GetId()
+			else
+				strCategoryKey = "C"..qcCategory:GetId()
+				strEpisodeKey = strCategoryKey.."ETasks"
+				strQuestKey = strEpisodeKey.."Q"..queUpdated:GetId()
+			end
+			
+			
+			local wndTop = self.arLeftTreeMap[strCategoryKey]
+			if wndTop ~= nil and wndTop:IsValid() then
+				local wndTopLevelBtn = wndTop:FindChild("TopLevelBtn")
+				if wndTopLevelBtn:IsChecked() then
+					self:OnTopLevelBtnCheck(wndTopLevelBtn, wndTopLevelBtn)
+		
+					local wndMiddle = self.arLeftTreeMap[strEpisodeKey]
+					if wndMiddle ~= nil and wndMiddle:IsValid() then
+						local wndBot = self.arLeftTreeMap[strQuestKey]
+						if wndBot ~= nil and wndBot:IsValid() then
+							local wndBottomLevelBtn = wndBot:FindChild("BottomLevelBtn")
+							if wndBottomLevelBtn:IsChecked() then
+								self:OnBottomLevelBtnCheck(wndBottomLevelBtn, wndBottomLevelBtn)
+							end
+						end
+					end
+				end
+			else
+				self:RedrawLeftTree()
+			end
+		
+		
+			if self.wndRightSide ~= nil and self.wndRightSide:IsShown() then
+				local queCurrent = self.wndRightSide:GetData()
+				if queCurrent ~= nil and  queCurrent == queUpdated then
+					self:DrawRightSide(queCurrent)
+					self:ResizeRight()
+				end
+			end
+			
+			self:ResizeTree()
+		else
+			local wndBottom = self.tTreeQuestsById[queUpdated:GetId()]
+			if wndBottom ~= nil and wndBottom:IsValid() then
+				self:HelperRemoveBottomLevelWindow(wndBot, queUpdated)
+			end
+			
+			if self.wndRightSide ~= nil and self.wndRightSide:IsShown() then
+				local queCurrent = self.wndRightSide:GetData()
+				if queCurrent ~= nil and  queCurrent == queUpdated then
+					self.wndRightSide:Show(false)
+					self.wndQuestInfoControls:Show(false)
+				end
 			end
 		end
 	end
@@ -1070,34 +1331,28 @@ function QuestLog:OnQuestStateChanged(queUpdated, eState)
 	end
 end
 
-function QuestLog:OnQuestObjectiveUpdated(queUpdated)
-	local queCurrent = self.wndRightSide:GetData()
-	if queCurrent and queCurrent:GetId() == queUpdated:GetId() then
-		self:RedrawEverything()
-	end
-
-	if queCurrent and queCurrent:GetState() == Quest.QuestState_Achieved then -- For some reason OnQuestStateChanged doesn't get called
-		self:OnDestroyQuestObject(queUpdated)
-		self:RedrawEverything()
-	end
-end
-
-function QuestLog:OnDestroyQuestObject(queTarget) -- QuestStateChanged, QuestObjectiveUpdated
-	if self.wndMain and self.wndMain:IsValid() and queTarget then
-		local wndBot = self.wndLeftSideScroll:FindChildByUserData("Q"..queTarget:GetId())
-		if wndBot then
-			wndBot:Destroy()
-			self:RedrawEverything()
-		end
-	end
-end
-
 function QuestLog:OnQuestTrackedChanged(queUpdated, bTracked)
-	if self.wndRightSide:IsShown()
-		and self.wndRightSide:GetData()
-		and self.wndRightSide:GetData() == queUpdated then
+	if not self.tTreeQuestsById then
+		return
+	end
+	
+	local wndBottom = self.tTreeQuestsById[queUpdated:GetId()]
+	
+	if wndBottom == nil or not wndBottom:IsShown() then
+		return
+	end
+	
+	wndBottom:FindChild("BottomLevelTrackQuestBtn"):SetCheck(bTracked)
+end
 
-		self:DrawRightSide(self.wndRightSide:GetData())
+function QuestLog:OnQuestObjectiveUpdated(queUpdated)
+	if self.wndRightSide == nil or not self.wndRightSide:IsShown() then
+		return
+	end
+	
+	local queCurrent = self.wndRightSide:GetData()
+	if queCurrent ~= nil and queCurrent == queUpdated then
+		self:DrawRightSide(queCurrent)
 		self:ResizeRight()
 	end
 end
@@ -1208,6 +1463,19 @@ function QuestLog:HelperBuildRewardsRec(wndReward, tRewardData, bReceived)
 	wndReward:FindChild("RewardItemText"):SetText(strText)
 end
 
+function QuestLog:HelperBuildXPRewardsRec(wndReward, bReceived)
+	if not bReceived then
+		return
+	end
+
+	local strText = String_GetWeaselString(Apollo.GetString("CRB_XPAmountInteger"), bReceived)
+	local strSprite = "IconSprites:Icon_Modifier_xp_001"
+
+	wndReward:FindChild("RewardIcon"):SetSprite(strSprite)
+	wndReward:FindChild("RewardItemText"):SetText(strText)
+	wndReward:SetTooltip(strText)
+end
+
 function QuestLog:OnRewardIconMouseUp(wndHandler, wndControl, eMouseButton)
 	if eMouseButton == GameLib.CodeEnumInputMouse.Right and wndHandler:GetData() then
 		Event_FireGenericEvent("GenericEvent_ContextMenuItem", wndHandler:GetData())
@@ -1254,7 +1522,7 @@ end
 
 function QuestLog:CheckLeftSideFilters(queQuest)
 	local bCompleteState = queQuest:GetState() == Quest.QuestState_Completed
-	local bResult1 = self.wndLeftFilterActive:IsChecked() and not bCompleteState and not queQuest:IsIgnored()
+	local bResult1 = self.wndLeftFilterActive:IsChecked() and not bCompleteState and not queQuest:IsIgnored() and queQuest:IsKnown()
 	local bResult2 = self.wndLeftFilterFinished:IsChecked() and bCompleteState
 	local bResult3 = self.wndLeftFilterHidden:IsChecked() and queQuest:IsIgnored()
 
