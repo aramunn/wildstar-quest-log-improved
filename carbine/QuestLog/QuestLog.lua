@@ -496,6 +496,8 @@ function QuestLog:RedrawLeftTree()
 end
 
 function QuestLog:LeftTreeBuildWorldStoryEpisodes(wndTop, strCategoryKey)
+	local bShowCompleted = self.wndLeftFilterFinished:IsChecked()
+
 	local arAllCategories = QuestLib.GetKnownCategories()
 	local arAllEpisodes = QuestLib.GetAllEpisodes(bShowCompleted, true)
 
@@ -540,6 +542,8 @@ end
 function QuestLog:LeftTreeBuildEpisodes(wndTop, strCategoryKey, qcCategory)
 	local fnDoesCategoryHaveQuests, fnDoesCategoryEpisodeHaveQuests = self:GetHaveQuestFunctions()
 
+	local bShowCompleted = self.wndLeftFilterFinished:IsChecked()
+	
 	local arAllEpisodes = QuestLib.GetAllEpisodes(bShowCompleted, true)
 	local wndTopLevelItems = wndTop:FindChild("TopLevelItems")
 	for idx, epiEpisode in pairs(arAllEpisodes) do
@@ -602,7 +606,7 @@ function QuestLog:HelperSetupBottomLevelWindow(wndBot, queQuest)
 	
 	wndBottomLevelTrackBtn:SetCheck(bIsTracked)
 	wndBottomLevelTrackBtn:SetTooltip(bIsTracked and Apollo.GetString("QuestTracker_StopTracking") or Apollo.GetString("QuestLog_AddToTracker"))
-		
+
 	local bOptionalQuest = queQuest:IsOptionalForEpisode(queQuest:GetEpisode():GetId())
 	local strLevel = String_GetWeaselString(Apollo.GetString("CRB_BracketsNumber_Space"), queQuest:GetConLevel())
 	local strQuestTitle = strLevel..String_GetWeaselString(queQuest:GetTitle())
@@ -745,7 +749,7 @@ function QuestLog:ResizeRight()
 	for key, wndObj in pairs(self.wndMain:FindChild("QuestInfoObjectivesList"):GetChildren()) do
 
 		if wndObj:FindChild("ObjectivesItemText") then
-			nWidth, nHeight = wndObj:FindChild("ObjectivesItemText"):SetHeightToContentHeight()
+		nWidth, nHeight = wndObj:FindChild("ObjectivesItemText"):SetHeightToContentHeight()
 		end
 		if wndObj:FindChild("QuestProgressItem") then
 			nHeight = nHeight + wndObj:FindChild("QuestProgressItem"):GetHeight()
@@ -845,9 +849,9 @@ function QuestLog:DrawRightSide(queSelected)
 
 	-- Text Summary
 	local strQuestSummary = ""
-	if eQuestState == Quest.QuestState_Completed and string.len(queSelected:GetCompletedSummary()) > 0 then
+	if eQuestState == Quest.QuestState_Completed and Apollo.StringLength(queSelected:GetCompletedSummary()) > 0 then
 		strQuestSummary = queSelected:GetCompletedSummary()
-	elseif string.len(queSelected:GetSummary()) > 0 then
+	elseif Apollo.StringLength(queSelected:GetSummary()) > 0 then
 		strQuestSummary = queSelected:GetSummary()
 	end
 	
@@ -888,7 +892,7 @@ function QuestLog:DrawRightSide(queSelected)
 	local tMoreInfoText = queSelected:GetMoreInfoText()
 	if #tMoreInfoText > 0 then
 		for idx, tValues in pairs(tMoreInfoText) do
-			if string.len(tValues.strSay) > 0 or string.len(tValues.strResponse) > 0 then
+			if Apollo.StringLength(tValues.strSay) > 0 or Apollo.StringLength(tValues.strResponse) > 0 then
 				strMoreInfo = strMoreInfo .. "<P Font=\"CRB_InterfaceMedium\" TextColor=\"UI_TextHoloBody\">"..tValues.strSay.."</P>"
 				strMoreInfo = strMoreInfo .. "<P Font=\"CRB_InterfaceMedium\" TextColor=\"UI_TextHoloBodyCyan\">"..tValues.strResponse.."</P>"
 				if idx ~= #tMoreInfoText then
@@ -1049,9 +1053,9 @@ function QuestLog:DrawUnknownRightSide(queSelected)
 
 	-- Text Summary
 	local strQuestSummary = ""
-	if eQuestState == Quest.QuestState_Completed and string.len(queSelected:GetCompletedSummary()) > 0 then
+	if eQuestState == Quest.QuestState_Completed and Apollo.StringLength(queSelected:GetCompletedSummary()) > 0 then
 		strQuestSummary = queSelected:GetCompletedSummary()
-	elseif string.len(queSelected:GetSummary()) > 0 then
+	elseif Apollo.StringLength(queSelected:GetSummary()) > 0 then
 		strQuestSummary = queSelected:GetSummary()
 	end
 
@@ -1123,7 +1127,7 @@ function QuestLog:OnTopLevelBtnCheck(wndHandler, wndControl)
 	self:ResizeTree()
 end
 
-function QuestLog:OnTopLevelBtnUncheck(wndHandler, wndControl)	
+function QuestLog:OnTopLevelBtnUncheck(wndHandler, wndControl)
 	self:ResizeTree()
 end
 
