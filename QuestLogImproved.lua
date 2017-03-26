@@ -9,7 +9,15 @@ function QuestLogImproved:HookApolloLoadForm()
   local funcLoadForm = Apollo.LoadForm
   Apollo.LoadForm = function(xmlDoc, strForm, wndParent, addon, ...)
     if addon == addonQuestLog then
-      Print("QuestLog loading "..strForm)
+      if strForm == "TopLevelItem" then
+        local wnd = funcLoadForm(xmlDoc, strForm, wndParent, addon, ...)
+        wnd:SetAnchorOffsets(0, 0, 0, 25)
+        wnd:FindChild("TopLevelBtn"):SetAnchorOffsets(0, 0, 0, 25)
+        wnd:FindChild("TopLevelBtn"):SetFont("CRB_HeaderSmall")
+        wnd:FindChild("TopLevelBtn"):ChangeArt("BK3:btnMetal_ExpandMenu_LargeClean")
+        wnd:FindChild("TopLevelItems"):SetAnchorOffsets(3, 26, -3, 0)
+        return wnd
+      end
     end
     return funcLoadForm(xmlDoc, strForm, wndParent, addon, ...)
   end
