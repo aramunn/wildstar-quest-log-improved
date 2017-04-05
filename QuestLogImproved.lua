@@ -1,14 +1,32 @@
 local QuestLogImproved = {}
 
 function QuestLogImproved:HookApolloLoadForm()
-  local addonQuestLog = Apollo.GetAddon("QuestLog")
-  if not addonQuestLog then
+  self.addonQuestLog = Apollo.GetAddon("QuestLog")
+  if not self.addonQuestLog then
     Print("addonQuestLog is nil")
     return
   end
+  
+  local funcRedrawLeftTree = self.addonQuestLog.RedrawLeftTree
+  self.addonQuestLog.RedrawLeftTree = function(...)
+    funcRedrawLeftTree(...)
+    local nQuestCount = QuestLib.GetCount()
+    local strColor = "UI_BtnTextGreenNormal"
+    if nQuestCount + 3 >= self.addonQuestLog.nQuestCountMax then
+      strColor = "ffff0000"
+    elseif nQuestCount + 10 >= self.addonQuestLog.nQuestCountMax then
+      strColor = "ffffb62e"
+    end
+    self.addonQuestLog.wndLeftFilterActive:SetText(string.format("Active Quests (%d/%d)",nQuestCount,self.addonQuestLog.nQuestCountMax))
+    local activeQuestsProgressBar = self.addonQuestLog.wndLeftFilterActive:FindChild("ActiveQuestsProgressBar")
+    activeQuestsProgressBar:SetMax(self.addonQuestLog.nQuestCountMax)
+    activeQuestsProgressBar:SetProgress(nQuestCount)
+    activeQuestsProgressBar:SetBarColor(strColor)
+  end
+  
   local funcLoadForm = Apollo.LoadForm
   Apollo.LoadForm = function(xmlDoc, strForm, wndParent, addon, ...)
-    if addon == addonQuestLog then
+    if addon == self.addonQuestLog then
       if strForm == "TopLevelItem" then
         local wnd = funcLoadForm(xmlDoc, strForm, wndParent, addon, ...)
         -- wnd:SetAnchorOffsets(0, 0, 0, 25)
@@ -33,8 +51,10 @@ function QuestLogImproved:HookApolloLoadForm()
         return wnd
       elseif strForm == "QuestLogForm" then
         local wnd = funcLoadForm(xmlDoc, strForm, wndParent, addon, ...)
-        wnd:FindChild("LeftSideFilterBtnsBG"):Destroy()
-        local buttons = funcLoadForm(self.xmlDoc, "LeftSideFilterBtnsBG", wnd, addon)
+        local wndOldButtons = wnd:FindChild("LeftSideFilterBtnsBG")
+        wndOldButtons:SetName("OldLeftSideFilterBtnsBG")
+        wndOldButtons:Destroy()
+        local buttons = funcLoadForm(self.xmlDoc, "LeftSideFilterBtnsBG", wnd, self.addonQuestLog)
         return wnd
       end
     end
@@ -103,7 +123,8 @@ function QuestLogImproved:OnLoad()
 end
 
 function QuestLogImproved:OnDocumentReady()
-  Apollo.RegisterSlashCommand("testqli3", "HookApolloLoadForm", self)
+  -- Apollo.RegisterSlashCommand("testqli3", "HookApolloLoadForm", self)
+  self:HookApolloLoadForm()
 end
 
 local QuestLogImprovedInst = QuestLogImproved:new()
