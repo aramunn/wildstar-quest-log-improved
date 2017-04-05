@@ -63,28 +63,12 @@ function QuestLogImproved:HookApolloLoadForm()
         local buttons = funcLoadForm(self.xmlDoc, "LeftSideFilterBtnsBG", wnd, addon)
         return wnd
       end
-      if strForm == "TopLevelItem" then
-        local wnd = funcLoadForm(xmlDoc, strForm, wndParent, addon, ...)
-        -- wnd:SetAnchorOffsets(0, 0, 0, 25)
-        -- wnd:FindChild("TopLevelBtn"):SetAnchorOffsets(0, 0, 0, 25)
-        -- wnd:FindChild("TopLevelBtn"):SetFont("CRB_HeaderSmall")
-        -- wnd:FindChild("TopLevelBtn"):ChangeArt("BK3:btnMetal_ExpandMenu_LargeClean")
-        -- wnd:FindChild("TopLevelItems"):SetAnchorOffsets(3, 26, -3, 0)
-        local wndBtn = wnd:FindChild("TopLevelBtn")
-        local nLP, nTP, nRP, nBP = wndBtn:GetAnchorPoints()
-        local nLO, nTO, nRO, nBO = wndBtn:GetAnchorOffsets()
-        wndBtn:SetAnchorPoints(nLP, 0, nRP, 0)
-        wndBtn:SetAnchorOffsets(nLO, 5, nRO, 35)
-        local wndItems = wnd:FindChild("TopLevelItems")
-        nLP, nTP, nRP, nBP = wndItems:GetAnchorPoints()
-        nLO, nTO, nRO, nBO = wndItems:GetAnchorOffsets()
-        wndItems:SetAnchorPoints(nLP, 0, nRP, nBP)
-        wndItems:SetAnchorOffsets(nLO, 35, nRO, nBO)
-        nLP, nTP, nRP, nBP = wnd:GetAnchorPoints()
-        nLO, nTO, nRO, nBO = wnd:GetAnchorOffsets()
-        wnd:SetAnchorPoints(nLP, nTP, nRP, 0)
-        wnd:SetAnchorOffsets(nLO, nTO, nRO, 40)
-        return wnd
+      local bIsQuestListItem = false
+      bIsQuestListItem = bIsQuestListItem or strForm == "TopLevelItem"
+      bIsQuestListItem = bIsQuestListItem or strForm == "MiddleLevelItem"
+      bIsQuestListItem = bIsQuestListItem or strForm == "BottomLevelItem"
+      if bIsQuestListItem then
+        return funcLoadForm(self.xmlDoc, strForm, wndParent, addon, ...)
       end
     end
     return funcLoadForm(xmlDoc, strForm, wndParent, addon, ...)
