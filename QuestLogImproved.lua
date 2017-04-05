@@ -8,21 +8,51 @@ function QuestLogImproved:HookQuestLogAddon()
   end
   
   local funcRedrawLeftTree = self.addonQuestLog.RedrawLeftTree
-  self.addonQuestLog.RedrawLeftTree = function(...)
-    funcRedrawLeftTree(...)
+  self.addonQuestLog.RedrawLeftTree = function(ref, ...)
+    funcRedrawLeftTree(ref, ...)
     local nQuestCount = QuestLib.GetCount()
     local strColor = "UI_BtnTextGreenNormal"
-    if nQuestCount + 3 >= self.addonQuestLog.nQuestCountMax then
+    if nQuestCount + 3 >= ref.nQuestCountMax then
       strColor = "ffff0000"
-    elseif nQuestCount + 10 >= self.addonQuestLog.nQuestCountMax then
+    elseif nQuestCount + 10 >= ref.nQuestCountMax then
       strColor = "ffffb62e"
     end
-    self.addonQuestLog.wndLeftFilterActive:SetText(string.format("Active Quests (%d/%d)",nQuestCount,self.addonQuestLog.nQuestCountMax))
-    local activeQuestsProgressBar = self.addonQuestLog.wndLeftFilterActive:FindChild("ActiveQuestsProgressBar")
-    activeQuestsProgressBar:SetMax(self.addonQuestLog.nQuestCountMax)
+    ref.wndLeftFilterActive:SetText(string.format("Active Quests (%d/%d)", nQuestCount, ref.nQuestCountMax))
+    local activeQuestsProgressBar = ref.wndLeftFilterActive:FindChild("ActiveQuestsProgressBar")
+    activeQuestsProgressBar:SetMax(ref.nQuestCountMax)
     activeQuestsProgressBar:SetProgress(nQuestCount)
     activeQuestsProgressBar:SetBarColor(strColor)
   end
+  
+  self.addonQuestLog.OnCollapseAllQuestsBtn = function(ref)
+    for _, wnd in pairs(ref.wndLeftSideScroll:GetChildren()) do
+      wnd:FindChild("TopLevelBtn"):SetCheck(false)
+    end
+    ref:RedrawLeftTree()
+    ref.wndLeftSideScroll:SetVScrollPos(0)
+    ref:ResizeTree()
+  end
+  
+  self.addonQuestLog.OnExpandAllQuestsBtn = function(ref)
+    for _, wnd in pairs(ref.wndLeftSideScroll:GetChildren()) do
+      local wndTopLevelBtn = wnd:FindChild("TopLevelBtn")
+      wndTopLevelBtn:SetCheck(true)
+      ref:OnTopLevelBtnCheck(wndTopLevelBtn, wndTopLevelBtn)
+    end
+    ref:RedrawLeftTree()
+    ref.wndLeftSideScroll:SetVScrollPos(0)
+    ref:ResizeTree()
+  end
+  
+  -- for idx1, wndTop in pairs(self.wndLeftSideScroll:GetChildren()) do
+    -- local wndTopLevelBtn = wndTop:FindChild("TopLevelBtn")
+    -- local wndTopLevelItems = wndTop:FindChild("TopLevelItems")
+    -- wndTopLevelBtn:SetCheck(set)
+    -- for idx2, wndMiddle in pairs(wndTopLevelItems:GetChildren()) do
+      -- local wndMiddleLevelBtn = wndMiddle:FindChild("MiddleLevelBtn")
+      -- wndMiddleLevelBtn:SetCheck(set)
+    -- end
+  -- end
 end
 
 function QuestLogImproved:HookApolloLoadForm()
@@ -34,7 +64,7 @@ function QuestLogImproved:HookApolloLoadForm()
         local wndOldButtons = wnd:FindChild("LeftSideFilterBtnsBG")
         wndOldButtons:SetName("OldLeftSideFilterBtnsBG")
         wndOldButtons:Destroy()
-        local buttons = funcLoadForm(self.xmlDoc, "LeftSideFilterBtnsBG", wnd, self.addonQuestLog)
+        local buttons = funcLoadForm(self.xmlDoc, "LeftSideFilterBtnsBG", wnd, addon)
         return wnd
       end
       if strForm == "TopLevelItem" then
