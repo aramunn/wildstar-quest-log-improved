@@ -1,6 +1,6 @@
 local QuestLogImproved = {}
 
-function QuestLogImproved:HookApolloLoadForm()
+function QuestLogImproved:HookQuestLogAddon()
   self.addonQuestLog = Apollo.GetAddon("QuestLog")
   if not self.addonQuestLog then
     Print("addonQuestLog is nil")
@@ -23,10 +23,20 @@ function QuestLogImproved:HookApolloLoadForm()
     activeQuestsProgressBar:SetProgress(nQuestCount)
     activeQuestsProgressBar:SetBarColor(strColor)
   end
-  
+end
+
+function QuestLogImproved:HookApolloLoadForm()
   local funcLoadForm = Apollo.LoadForm
   Apollo.LoadForm = function(xmlDoc, strForm, wndParent, addon, ...)
     if addon == self.addonQuestLog then
+      if strForm == "QuestLogForm" then
+        local wnd = funcLoadForm(xmlDoc, strForm, wndParent, addon, ...)
+        local wndOldButtons = wnd:FindChild("LeftSideFilterBtnsBG")
+        wndOldButtons:SetName("OldLeftSideFilterBtnsBG")
+        wndOldButtons:Destroy()
+        local buttons = funcLoadForm(self.xmlDoc, "LeftSideFilterBtnsBG", wnd, self.addonQuestLog)
+        return wnd
+      end
       if strForm == "TopLevelItem" then
         local wnd = funcLoadForm(xmlDoc, strForm, wndParent, addon, ...)
         -- wnd:SetAnchorOffsets(0, 0, 0, 25)
@@ -49,59 +59,10 @@ function QuestLogImproved:HookApolloLoadForm()
         wnd:SetAnchorPoints(nLP, nTP, nRP, 0)
         wnd:SetAnchorOffsets(nLO, nTO, nRO, 40)
         return wnd
-      elseif strForm == "QuestLogForm" then
-        local wnd = funcLoadForm(xmlDoc, strForm, wndParent, addon, ...)
-        local wndOldButtons = wnd:FindChild("LeftSideFilterBtnsBG")
-        wndOldButtons:SetName("OldLeftSideFilterBtnsBG")
-        wndOldButtons:Destroy()
-        local buttons = funcLoadForm(self.xmlDoc, "LeftSideFilterBtnsBG", wnd, self.addonQuestLog)
-        return wnd
       end
     end
     return funcLoadForm(xmlDoc, strForm, wndParent, addon, ...)
   end
-end
-
-function QuestLogImproved:MakeQuestLogXmlModifications()
-  local addon = Apollo.GetAddon("QuestLog")
-  if not addon then
-    Print("addon is nil")
-    return
-  end
-  if not addon.xmlDoc:IsLoaded() then
-    Print("not loaded")
-    return
-  end
-  local tXml = addon.xmlDoc:ToTable()
-  for idx, tForm in pairs(tXml) do
-    if tForm.Name == "TopLevelItem" then
-      Print("was: "..tForm.Sprite)
-      -- tForm.Sprite = "BasicSprites:WhiteFill"
-      -- Print("now: "..tForm.Sprite)
-    end
-  end
-  addon.xmlDoc = XmlDoc.CreateFromTable(tXml)
-end
-
-function QuestLogImproved:MakeQuestLogModifications()
-  local addon = Apollo.GetAddon("QuestLog")
-  if not addon then return end
-  for idx, wndTop in ipairs(addon.wndLeftSideScroll:GetChildren()) do
-    Print("was: "..tostring(wndTop:GetSprite()))
-    wndTop:SetSprite("WhiteFill")
-    Print("now: "..tostring(wndTop:GetSprite()))
-  end
-end
-
-function QuestLogImproved:OnSave(eLevel)
-  if eLevel ~= GameLib.CodeEnumAddonSaveLevel.Account then
-    return
-  end
-  local tSave = {}
-  return tSave
-end
-
-function QuestLogImproved:OnRestore(eLevel, tSave)
 end
 
 function QuestLogImproved:new(o)
@@ -118,12 +79,10 @@ end
 function QuestLogImproved:OnLoad()
   self.xmlDoc = XmlDoc.CreateFromFile("QuestLogImproved.xml")
   self.xmlDoc:RegisterCallback("OnDocumentReady", self)
-  Apollo.RegisterSlashCommand("testqli", "MakeQuestLogModifications", self)
-  Apollo.RegisterSlashCommand("testqli2", "MakeQuestLogXmlModifications", self)
 end
 
 function QuestLogImproved:OnDocumentReady()
-  -- Apollo.RegisterSlashCommand("testqli3", "HookApolloLoadForm", self)
+  self:HookQuestLogAddon()
   self:HookApolloLoadForm()
 end
 
