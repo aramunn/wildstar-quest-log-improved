@@ -20,6 +20,10 @@ function QuestLogImproved:HookQuestLogAddon()
   self.addonQuestLog.OnExpandAllQuestsBtn = function(ref)
     self:SetCheckAllLeftSide(true)
   end
+  
+  self.addonQuestLog.OnQuestItemMouseButtonUp = function(ref, wndHandler, wndControl)
+    self:ShowContextMenu(wndControl)
+  end
 end
 
 function QuestLogImproved:PostRedrawLeftTree(addonQuestLog)
@@ -49,6 +53,10 @@ function QuestLogImproved:SetCheckAllLeftSide(bChecked)
   self.addonQuestLog:RedrawLeftTree()
   self.addonQuestLog.wndLeftSideScroll:SetVScrollPos(0)
   self.addonQuestLog:ResizeTree()
+end
+
+function QuestLogImproved:ShowContextMenu(wnd)
+  Print("here with: "..tostring(wnd:GetName()))
 end
 
 function QuestLogImproved:HookApolloLoadForm()
