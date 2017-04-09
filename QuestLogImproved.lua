@@ -100,8 +100,11 @@ function QuestLogImproved:OnRegularBtn(wndHandler, wndControl)
     self.wndContextMenu:Destroy()
     self.addonQuestLog:RedrawLeftTree()
   end
-  if strButtonName == "BtnAbandonConfirm" then
-    self.addonQuestLog:DestroyAndRedraw()
+  local bDelayedRedraw = false
+  bDelayedRedraw = bDelayedRedraw or strButtonName == "BtnAbandonConfirm"
+  bDelayedRedraw = bDelayedRedraw or strButtonName == "BtnIgnore"
+  if bDelayedRedraw then
+    ApolloTimer.Create(.5, false, "DestroyAndRedraw", self.addonQuestLog)
   end
 end
 
