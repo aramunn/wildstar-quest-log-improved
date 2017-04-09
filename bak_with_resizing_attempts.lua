@@ -13,6 +13,40 @@ function QuestLogImproved:HookQuestLogAddon()
     self:PostRedrawLeftTree(ref)
   end
   
+  -- local funcHelperSetupBottomLevelWindow = self.addonQuestLog.HelperSetupBottomLevelWindow
+  -- self.addonQuestLog.HelperSetupBottomLevelWindow = function (ref, wndBot, ...)
+    -- funcHelperSetupBottomLevelWindow(ref, wndBot, ...)
+    -- local wndBottomLevelBtn = wndBot:FindChild("BottomLevelBtn")
+    -- local wndBottomLevelBtnText = wndBot:FindChild("BottomLevelBtnText")
+    -- local strText = wndBottomLevelBtnText:GetText().." blah blah blah blah blah blah blah blah blah blah"
+    -- wndBottomLevelBtnText:SetText(strText)
+    -- wndBottomLevelBtn:SetText(strText)
+  -- end
+  
+  -- local funcResizeTree = self.addonQuestLog.ResizeTree
+  -- self.addonQuestLog.ResizeTree = function (ref, ...)
+    -- funcResizeTree(ref, ...)
+    -- for _, wndTop in pairs(ref.wndLeftSideScroll:GetChildren()) do
+      -- for _, wndMid in pairs(wndTop:FindChild("TopLevelItems"):GetChildren()) do
+        -- local wndMidLevelItems = wndMid:FindChild("MiddleLevelItems")
+        -- local nMidLeft, nMidTop, nMidRight, nMidBottom = wndMid:GetAnchorOffsets()
+        -- for _, wndBot in pairs(wndMid:FindChild("MiddleLevelItems"):GetChildren()) do
+          -- local nBotHeight = wndBot:GetHeight()
+          -- if nBotHeight == 40 or nBotHeight == 55 then
+            -- local nBotLeft, nBotTop, nBotRight, nBotBottom = wndBot:GetAnchorOffsets()
+            -- wndBot:SetAnchorOffsets(nBotLeft, nBotTop, nBotRight, nBotTop + nBotHeight + 20)
+            -- Print(tostring(nBotHeight).." -> "..tostring(wndBot:GetHeight()))
+          -- end
+        -- end
+        -- local nMidItemHeights = wndMidLevelItems:ArrangeChildrenVert(Window.CodeEnumArrangeOrigin.LeftOrTop)
+        -- if nMidItemHeights > 0 then
+          -- nMidItemHeights = nMidItemHeights + 4
+        -- end
+        -- wndMid:SetAnchorOffsets(nMidLeft, nMidTop, nMidRight, nMidTop + ref.knMiddleLevelHeight + nMidItemHeights)
+      -- end
+    -- end
+  -- end
+  
   self.addonQuestLog.OnCollapseAllQuestsBtn = function (ref)
     self:SetCheckAllLeftSide(false)
   end
@@ -60,6 +94,7 @@ function QuestLogImproved:ShowContextMenu(wnd)
 end
 
 function QuestLogImproved:HookApolloLoadForm()
+  -- self.tWnds = {}
   local funcLoadForm = Apollo.LoadForm
   Apollo.LoadForm = function(xmlDoc, strForm, wndParent, addon, ...)
     if addon == self.addonQuestLog then
@@ -76,12 +111,47 @@ function QuestLogImproved:HookApolloLoadForm()
       bIsQuestListItem = bIsQuestListItem or strForm == "MiddleLevelItem"
       bIsQuestListItem = bIsQuestListItem or strForm == "BottomLevelItem"
       if bIsQuestListItem then
-        return funcLoadForm(self.xmlDoc, strForm, wndParent, addon, ...)
+        local wnd = funcLoadForm(self.xmlDoc, strForm, wndParent, addon, ...)
+        -- if strForm == "MiddleLevelItem" then
+          -- self:HookSetAnchorOffsets(wnd, 0)
+        -- elseif strForm == "BottomLevelItem" then
+          -- self:HookSetAnchorOffsets(wnd, -6)
+        -- end
+        return wnd
       end
     end
     return funcLoadForm(xmlDoc, strForm, wndParent, addon, ...)
   end
 end
+
+-- function QuestLogImproved:HookSetAnchorOffsets(wnd, nOffset)
+  -- self:CleanWnds()
+  -- self.tWnds[wnd] = nOffset
+  -- if not self.bHookedSetAnchorOffsets then
+    -- local funcSetAnchorOffsets = wnd.SetAnchorOffsets
+    -- wnd.__index.SetAnchorOffsets = function (ref, nL, nT, nR, nB, ...)
+      -- return funcSetAnchorOffsets(ref, nL, nT, nR, nB + self:GetWndOffset(ref), ...)
+    -- end
+    -- self.bHookedSetAnchorOffsets = true
+  -- end
+-- end
+
+-- function QuestLogImproved:CleanWnds()
+  -- for wnd in pairs(self.tWnds) do
+    -- if not wnd:IsValid() then
+      -- self.tWnds[wnd] = nil
+    -- end
+  -- end
+-- end
+
+-- function QuestLogImproved:GetWndOffset(ref)
+  -- for wnd, nOffset in pairs(self.tWnds) do
+    -- if wnd == ref then
+      -- return nOffset
+    -- end
+  -- end
+  -- return 0
+-- end
 
 function QuestLogImproved:new(o)
   o = o or {}
