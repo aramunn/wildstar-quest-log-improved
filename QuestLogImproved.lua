@@ -104,7 +104,7 @@ function QuestLogImproved:OnRegularBtn(wndHandler, wndControl)
   bDelayedRedraw = bDelayedRedraw or strButtonName == "BtnAbandonConfirm"
   bDelayedRedraw = bDelayedRedraw or strButtonName == "BtnIgnore"
   if bDelayedRedraw then
-    ApolloTimer.Create(.5, false, "DestroyAndRedraw", self.addonQuestLog)
+    ApolloTimer.Create(.5, false, "DelayedDestroyAndRedraw", self)
   end
 end
 
@@ -129,6 +129,30 @@ function QuestLogImproved:HandleContextMenuButton(strButtonName, wnd, nLevel)
       self:HandleContextMenuButton(strButtonName, wndItem:FindChild(tWindowNames.button), nLevel - 1)
     end
   end
+end
+
+function QuestLogImproved:DelayedDestroyAndRedraw()
+  local wndScroll = self.addonQuestLog.wndLeftSideScroll
+  local nVScrollPos = wndScroll:GetVScrollPos()
+  local tChecked = {}
+  for _, wndTop in pairs(wndScroll:GetChildren()) do
+    local wndTopBtn = wndTop:FindChild("TopLevelBtn")
+    if wndTopBtn:IsChecked() then
+      tChecked[wndTopBtn:GetText()] = true
+    end
+  end
+  self.addonQuestLog:DestroyAndRedraw()
+  for _, wndTop in pairs(wndScroll:GetChildren()) do
+    local wndTopBtn = wndTop:FindChild("TopLevelBtn")
+    local bChecked = tChecked[wndTopBtn:GetText()] or false
+    wndTopBtn:SetCheck(bChecked)
+    if bChecked then
+      self.addonQuestLog:OnTopLevelBtnCheck(wndTopBtn, wndTopBtn)
+    else
+      self.addonQuestLog:OnTopLevelBtnUncheck(wndTopBtn, wndTopBtn)
+    end
+  end
+  wndScroll:SetVScrollPos(nVScrollPos)
 end
 
 function QuestLogImproved:HookApolloLoadForm()
