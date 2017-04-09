@@ -1,1 +1,2 @@
+New in 15.1: bumping API version
 New in 15.0: rework code to modify instead of replacing
