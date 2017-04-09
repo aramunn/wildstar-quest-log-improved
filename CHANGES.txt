@@ -1,1 +1,1 @@
-New in 11.2.0: added right-click menu to left side list buttons
+New in 15.0: rework code to modify instead of replacing
